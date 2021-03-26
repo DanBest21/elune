@@ -14,25 +14,25 @@ local indent_token = lpeg.S("\t")
 local newline_token = lpeg.S("\r\n")
 
 -- Keywords
-local global_token = lpeg.P("global")
-local while_token = lpeg.P("while")
-local do_token = lpeg.P("do")
-local for_token = lpeg.P("for")
-local if_token = lpeg.P("if")
-local else_token = lpeg.P("else")
-local switch_token = lpeg.P("switch")
-local try_token = lpeg.P("try")
-local catch_token = lpeg.P("catch")
-local and_token = lpeg.P("and")
-local or_token = lpeg.P("or")
-local is_token = lpeg.P("is")
-local not_token = lpeg.P("not")
-local in_token = lpeg.P("in")
-local break_token = lpeg.P("break")
-local continue_token = lpeg.P("continue")
-local len_token = lpeg.P("len")
-local return_token = lpeg.P("return")
-local import_token = lpeg.P("import")
+local global_token = white_token * lpeg.P("global")
+local while_token = white_token * lpeg.P("while")
+local do_token = white_token * lpeg.P("do")
+local for_token = white_token * lpeg.P("for")
+local if_token = white_token * lpeg.P("if")
+local else_token = white_token * lpeg.P("else")
+local switch_token = white_token * lpeg.P("switch")
+local try_token = white_token * lpeg.P("try")
+local catch_token = white_token * lpeg.P("catch")
+local and_token = white_token * lpeg.P("and")
+local or_token = white_token * lpeg.P("or")
+local is_token = white_token * lpeg.P("is")
+local not_token = white_token * lpeg.P("not")
+local in_token = white_token * lpeg.P("in")
+local break_token = white_token * lpeg.P("break")
+local continue_token = white_token * lpeg.P("continue")
+local len_token = white_token * lpeg.P("len")
+local return_token = white_token * lpeg.P("return")
+local import_token = white_token * lpeg.P("import")
 
 -- Boolean
 local boolean_type_token = lpeg.P("boolean")
@@ -92,3 +92,15 @@ local exponent_assignment_token = exponent_token * equals_token
 local concat_token = lpeg.P("++")
 
 -- [[ Parser ]]
+local function node(p)
+    return p / function(left, op, right)
+        return { op, left, right }
+    end
+end
+
+local parser = lpeg.P({
+    "expressions",
+    expressions = lpeg.V("expressions") + lpeg.V("expression") * -1,
+    expression = lpeg.V("assignment"),
+    assignment = lpeg.V("type") * string_token * equals_token * 
+})

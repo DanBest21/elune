@@ -22,8 +22,11 @@ local calculator = lpeg.P({
   input = lpeg.V("exp") * -1,
   exp = lpeg.V("term") + lpeg.V("factor") + integer,
   term = node((lpeg.V("factor") + integer) * addsub * lpeg.V("exp")),
-  factor = node(integer * muldiv * (lpeg.V("factor") + integer))
+  -- factor = node(integer * muldiv * (lpeg.V("factor") + integer))
+  factor = node(lpeg.V("exp") * muldiv * lpeg.V("exp"))
 })
+
+print(calculator:match("5"))
 
 print(inspect(calculator:match("5*3*2"))) --> {"*", 5, {"*", 3, 2}})
 
