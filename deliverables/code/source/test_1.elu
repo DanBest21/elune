@@ -1,0 +1,42 @@
+global g = 10
+
+i = 1
+j = 2
+
+obj = []
+obj['x'] = 5
+
+def multiply(x, y):
+	return x * y
+;
+
+global def multiply_g(x):
+	return x * g
+;
+
+def obj:multiply_o(x):
+	return x * obj.x
+;
+
+def map(f, xs):
+	for i = 0, i < length xs, i += 1:
+		xs[i] = f(xs[i])
+	;
+	
+	return xs
+;
+
+def filter(b, xs):
+	ys = []
+	i = 0
+	
+	foreach x in xs:
+		if b(x):
+			ys[i] = x
+			i += 1
+		;
+	;
+;
+
+print map(multiply_g, [1, 2, 3, 4, 5])
+print filter(lambda x : if x % 2: return true else: return false;;, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
