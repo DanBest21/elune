@@ -10,6 +10,12 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface EluneVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link EluneParser#start}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStart(EluneParser.StartContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link EluneParser#chunk}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

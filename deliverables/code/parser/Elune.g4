@@ -41,7 +41,7 @@ Tested by Alexander Alexeev with Test suite for Lua 5.3 http://www.lua.org/tests
 
 grammar Elune;
 
-chunk
+root
     : importdef? block EOF
     ;
 
@@ -52,6 +52,7 @@ block
 stat
     : ';'
     | 'global' varlist '=' explist
+    | varlist '=' explist
     | functioncall
     | label
     | 'break'
@@ -63,12 +64,13 @@ stat
     | 'if' exp ':' block ('elseif' exp ':' block)* ('else' ':' block)? ';'
     | 'for' NAME '=' exp ',' exp (',' exp)? ':' block ';'
     | 'foreach' namelist 'in' explist ':' block ';'
-    | 'global' 'def' funcname ':' funcbody
-    | 'def' NAME ':' funcbody
+    | 'global' 'def' funcname funcbody
+    | 'def' funcname funcbody
     | attnamelist ('=' explist)?
     | 'switch' ':' ('case' exp ':' block)+ ('default' ':' block)? ';'
     | 'try' ':' block ('catch' exp ':' block)+ ';'
     | assignexp
+    | 'print' exp
     ;
 
 importdef
@@ -125,11 +127,12 @@ exp
     | number
     | string
     | '...'
-    | functiondef
+    | anondef
     | prefixexp
     | tableconstructor
     | <assoc=right> exp operatorPower exp
     | operatorUnary exp
+    | 'length' exp
     | exp operatorMulDivMod exp
     | exp operatorAddSub exp
     | <assoc=right> exp operatorStrcat exp
@@ -137,6 +140,7 @@ exp
     | exp operatorAnd exp
     | exp operatorOr exp
     | exp operatorBitwise exp
+    | assignexp
     ;
 
 prefixexp
@@ -167,20 +171,24 @@ args
     : '(' explist? ')' | tableconstructor | string
     ;
 
-functiondef
-    : 'lambda' funcbody
+anondef
+    : 'lambda' anonlist ':' block ';'
+    ;
+
+anonlist
+    : NAME+
     ;
 
 funcbody
-    : parlist? ':' block ';'
+    : '(' parlist? ')' ':' block ';'
     ;
 
 parlist
-    : namelist (',' '...')? | '...'
+    : anondef? namelist (',' anondef)* (',' '...')? | '...'
     ;
 
 tableconstructor
-    : '{' fieldlist? '}'
+    : '[' fieldlist? ']'
     ;
 
 fieldlist
@@ -217,7 +225,7 @@ operatorBitwise
 	: '&' | '|' | '~' | '<<' | '>>';
 
 operatorUnary
-    : 'not' | '#' | '-' | '~';
+    : 'not' | '-' | '~';
 
 operatorPower
     : '^';
@@ -321,7 +329,7 @@ HexDigit
     ;
 	
 COMMENT
-    : '/*' NESTED_STR '*/' -> channel(HIDDEN)
+    : '/*' .*? '*/' -> channel(HIDDEN)
     ;
 	
 LINE_COMMENT

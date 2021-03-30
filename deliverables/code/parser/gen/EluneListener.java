@@ -7,6 +7,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface EluneListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link EluneParser#start}.
+	 * @param ctx the parse tree
+	 */
+	void enterStart(EluneParser.StartContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EluneParser#start}.
+	 * @param ctx the parse tree
+	 */
+	void exitStart(EluneParser.StartContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link EluneParser#chunk}.
 	 * @param ctx the parse tree
 	 */
