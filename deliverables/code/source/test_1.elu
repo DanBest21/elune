@@ -1,15 +1,23 @@
 global g = 10
 
-i, j = 1, 2
+i, j = 1, 2 + 1
 
 obj = []
 obj['x'] = 5
 
-def multiply(x, y):
-	return x * y;
+global g_obj = [x = 5, y = 6]
 
-global def multiply_g(x):
-	return x * g;
+def multiply(x, y)
+{
+	return x * y
+}
 
-def obj:multiply_o(x):
-	return x * obj.x;
+global def multiply_g(x)
+{
+	return x * g
+}
+
+def obj:multiply_o(x)
+{
+	return x * obj.x
+}

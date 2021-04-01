@@ -43,7 +43,9 @@ public class Translator
     {
         private final StringBuilder translatedCode = new StringBuilder();
         private final List<String> globalScope = new ArrayList<>();
-        private final Block currentBlock = new Block(null);
+        private Block currentBlock = new Block(null);
+
+        private final static EluneExprTranslator exprTranslator = new EluneExprTranslator();
 
         @Override
         public void enterSep(EluneParser.SepContext ctx)
@@ -71,7 +73,7 @@ public class Translator
             for (int i = 0; i < ctx.explist().getChildCount(); i++)
             {
                 if (!ctx.explist().getChild(i).getText().equals(","))
-                    valueList.add(ctx.explist().getChild(i).getText());
+                    valueList.add((String)exprTranslator.visit(ctx.explist().getChild(i)));
             }
 
             map.put("values", valueList.toArray());
@@ -109,7 +111,7 @@ public class Translator
             for (int i = 0; i < ctx.explist().getChildCount(); i++)
             {
                 if (!ctx.explist().getChild(i).getText().equals(","))
-                    valueList.add(ctx.explist().getChild(i).getText());
+                    valueList.add((String)exprTranslator.visit(ctx.explist().getChild(i)));
             }
 
             map.put("values", valueList.toArray());
@@ -126,13 +128,18 @@ public class Translator
             Map<String, Object> map = new HashMap<>();
 
             map.put("name", ctx.funcname().getText());
+            Block newBlock = new Block(currentBlock);
 
             List<String> args = new ArrayList<>();
 
             for (int i = 0; i < ctx.funcbody().parlist().namelist().getChildCount(); i++)
             {
                 if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
-                    args.add(ctx.funcbody().parlist().namelist().getChild(i).getText());
+                {
+                    String arg = ctx.funcbody().parlist().namelist().getChild(i).getText();
+                    args.add(arg);
+                    newBlock.putVarInScope(arg);
+                }
             }
 
             if (ctx.funcbody().parlist().getChildCount() > 1)
@@ -142,12 +149,14 @@ public class Translator
 
             translatedCode.append("\n").append(LuaRenderer.gen("globalFuncDef", map)).append("\n");
             LuaRenderer.increaseTab();
+            currentBlock = newBlock;
         }
 
         @Override
         public void exitGlobalFunc(EluneParser.GlobalFuncContext ctx)
         {
             LuaRenderer.decreaseTab();
+            currentBlock = currentBlock.parentBlock;
             translatedCode.append(LuaRenderer.gen("end", null)).append("\n");
         }
 
@@ -157,13 +166,18 @@ public class Translator
             Map<String, Object> map = new HashMap<>();
 
             map.put("name", ctx.funcname().getText());
+            Block newBlock = new Block(currentBlock);
 
             List<String> args = new ArrayList<>();
 
             for (int i = 0; i < ctx.funcbody().parlist().namelist().getChildCount(); i++)
             {
                 if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
-                    args.add(ctx.funcbody().parlist().namelist().getChild(i).getText());
+                {
+                    String arg = ctx.funcbody().parlist().namelist().getChild(i).getText();
+                    args.add(arg);
+                    newBlock.putVarInScope(arg);
+                }
             }
 
             if (ctx.funcbody().parlist().getChildCount() > 1)
@@ -173,43 +187,43 @@ public class Translator
 
             translatedCode.append("\n").append(LuaRenderer.gen("funcDef", map)).append("\n");
             LuaRenderer.increaseTab();
+            currentBlock = newBlock;
         }
 
         @Override
         public void exitFunc(EluneParser.FuncContext ctx)
         {
             LuaRenderer.decreaseTab();
+            currentBlock = currentBlock.parentBlock;
             translatedCode.append(LuaRenderer.gen("end", null)).append("\n");
         }
 
         @Override
-        public void enterAddSub(EluneParser.AddSubContext ctx)
+        public void enterFor(EluneParser.ForContext ctx)
         {
             Map<String, Object> map = new HashMap<>();
 
-            map.put("x", ctx.exp(0).getText());
-            map.put("y", ctx.exp(1).getText());
-            map.put("symbol", ctx.operatorAddSub().getText());
-
-            translatedCode.append(LuaRenderer.gen("calculation", map)).append("\n");
-        }
-
-        @Override
-        public void enterMulDivMod(EluneParser.MulDivModContext ctx)
-        {
-            Map<String, Object> map = new HashMap<>();
-
-            map.put("x", ctx.exp(0).getText());
-            map.put("y", ctx.exp(1).getText());
-            map.put("symbol", ctx.operatorMulDivMod().getText());
-
-            translatedCode.append(LuaRenderer.gen("calculation", map)).append("\n");
+            // map.put()
         }
 
         @Override
         public void enterRetstat(EluneParser.RetstatContext ctx)
         {
-            translatedCode.append(LuaRenderer.gen("return", null));
+            Map<String, Object> map = new HashMap<>();
+            List<String> values = new ArrayList<>();
+
+            if (ctx.explist() != null)
+            {
+                for (int i = 0; i < ctx.explist().getChildCount(); i++)
+                {
+                    if (!ctx.explist().getChild(i).getText().equals(",") || !ctx.explist().getChild(i).getText().equals(" "))
+                        values.add((String)exprTranslator.visit(ctx.explist().getChild(i)));
+                }
+            }
+
+            map.put("values", values);
+
+            translatedCode.append(LuaRenderer.gen("return", map)).append("\n");
         }
 
         public List<String> getScope()
@@ -251,6 +265,73 @@ public class Translator
 
                 return scope;
             }
+        }
+    }
+
+    private static class EluneExprTranslator<String> extends EluneBaseVisitor<java.lang.String>
+    {
+        @Override
+        public java.lang.String visitNumber(EluneParser.NumberContext ctx)
+        {
+            return ctx.getText();
+        }
+
+        @Override
+        public java.lang.String visitTableconstructor(EluneParser.TableconstructorContext ctx)
+        {
+            if (ctx.fieldlist() != null)
+                return "{" + this.visit(ctx.fieldlist()) + "}";
+            else
+                return "{}";
+        }
+
+        @Override
+        public java.lang.String visitFieldlist(EluneParser.FieldlistContext ctx)
+        {
+            StringBuilder fieldList = new StringBuilder();
+
+            for (int i = 0; i < ctx.getChildCount(); i++)
+            {
+                fieldList.append(this.visit(ctx.getChild(i)));
+            }
+
+            return fieldList.toString();
+        }
+
+        @Override
+        public java.lang.String visitField(EluneParser.FieldContext ctx)
+        {
+            return "";
+        }
+
+        @Override
+        public java.lang.String visitFieldsep(EluneParser.FieldsepContext ctx)
+        {
+            return ctx.getText() + " ";
+        }
+
+        @Override
+        public java.lang.String visitAddSub(EluneParser.AddSubContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("x", ctx.exp(0).getText());
+            map.put("y", ctx.exp(1).getText());
+            map.put("symbol", ctx.operatorAddSub().getText());
+
+            return LuaRenderer.gen("calculation", map);
+        }
+
+        @Override
+        public java.lang.String visitMulDivMod(EluneParser.MulDivModContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("x", ctx.exp(0).getText());
+            map.put("y", ctx.exp(1).getText());
+            map.put("symbol", ctx.operatorMulDivMod().getText());
+
+            return LuaRenderer.gen("calculation", map);
         }
     }
 

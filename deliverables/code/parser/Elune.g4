@@ -50,27 +50,27 @@ block
     ;
 
 stat
-    : ';'                                                                   #sep
-    | 'global' varlist '=' explist                                          #globalVar
-    | varlist '=' explist                                                   #var
-    | functioncall                                                          #funcCall
-    | label                                                                 #statLabel
-    | 'break'                                                               #break
-    | 'continue'                                                            #continue
-    | 'goto' NAME                                                           #goto
-    | 'do' ':' block ';'                                                    #do
-    | 'while' exp ':' block ';'                                             #while
-    | 'do' ':' block 'while' exp                                            #doWhile
-    | 'if' exp ':' block ('elseif' exp ':' block)* ('else' ':' block)? ';'  #ifElse
-    | 'for' NAME '=' exp ',' exp (',' exp)? ':' block ';'                   #for
-    | 'foreach' namelist 'in' explist ':' block ';'                         #foreach
-    | 'global' 'def' funcname funcbody                                      #globalFunc
-    | 'def' funcname funcbody                                               #func
-    | attnamelist ('=' explist)?                                            #att
-    | 'switch' ':' ('case' exp ':' block)+ ('default' ':' block)? ';'       #switch
-    | 'try' ':' block ('catch' exp ':' block)+ ';'                          #tryCatch
-    | assignexp                                                             #assign
-    | 'print' exp                                                           #print
+    : ';'                                                                           #sep
+    | 'global' varlist '=' explist                                                  #globalVar
+    | varlist '=' explist                                                           #var
+    | functioncall                                                                  #funcCall
+    | label                                                                         #statLabel
+    | 'break'                                                                       #break
+    | 'continue'                                                                    #continue
+    | 'goto' NAME                                                                   #goto
+    | 'do' '{' block '}'                                                            #do
+    | 'while' exp '{' block '}'                                                     #while
+    | 'do' '{' block '}' 'while' exp                                                #doWhile
+    | 'if' exp '{' block '}' ('elseif' exp '{' block '}')* ('else' '{' block '}')?  #ifElse
+    | 'for' NAME '=' exp ',' exp (',' exp)? '{' block '}'                           #for
+    | 'foreach' namelist 'in' explist '{' block '}'                                 #foreach
+    | 'global' 'def' funcname funcbody                                              #globalFunc
+    | 'def' funcname funcbody                                                       #func
+    | attnamelist ('=' explist)?                                                    #att
+    | 'switch' '{' ('case' exp ':' block)+ ('default' ':' block)? '}'               #switch
+    | 'try' '{' block ('catch' exp ':' block)+ '}'                                  #tryCatch
+    | assignexp                                                                     #assign
+    | 'print' exp                                                                   #print
     ;
 
 importdef
@@ -123,26 +123,26 @@ explist
     ;
 
 exp
-    : 'null'                                                                #null
-    | 'false'                                                               #false
-    | 'true'                                                                #true
-    | number                                                                #number_
-    | string                                                                #string_
-    | '...'                                                                 #allArgs
-    | anondef                                                               #anondef_
-    | prefixexp                                                             #prefixexp_
-    | tableconstructor                                                      #tableconstructor_
-    | <assoc=right> exp operatorPower exp                                   #power
-    | operatorUnary exp                                                     #unary
-    | 'length' exp                                                          #length
-    | exp operatorMulDivMod exp                                             #mulDivMod
-    | exp operatorAddSub exp                                                #addSub
-    | <assoc=right> exp operatorStrcat exp                                  #concat
-    | exp operatorComparison exp                                            #compare
-    | exp operatorAnd exp                                                   #and
-    | exp operatorOr exp                                                    #or
-    | exp operatorBitwise exp                                               #bitwise
-    | assignexp                                                             #assignexp_
+    : 'null'                                                                        #null
+    | 'false'                                                                       #false
+    | 'true'                                                                        #true
+    | number                                                                        #number_
+    | string                                                                        #string_
+    | '...'                                                                         #allArgs
+    | anondef                                                                       #anondef_
+    | prefixexp                                                                     #prefixexp_
+    | tableconstructor                                                              #tableconstructor_
+    | <assoc=right> exp operatorPower exp                                           #power
+    | operatorUnary exp                                                             #unary
+    | 'length' exp                                                                  #length
+    | exp operatorMulDivMod exp                                                     #mulDivMod
+    | exp operatorAddSub exp                                                        #addSub
+    | <assoc=right> exp operatorStrcat exp                                          #concat
+    | exp operatorComparison exp                                                    #compare
+    | exp operatorAnd exp                                                           #and
+    | exp operatorOr exp                                                            #or
+    | exp operatorBitwise exp                                                       #bitwise
+    | assignexp                                                                     #assignexp_
     ;
 
 prefixexp
@@ -174,7 +174,7 @@ args
     ;
 
 anondef
-    : 'lambda' anonlist ':' block ';'
+    : 'lambda' anonlist '{' block '}'
     ;
 
 anonlist
@@ -186,7 +186,7 @@ anonOrName
     ;
 
 funcbody
-    : '(' parlist? ')' ':' block ';'
+    : '(' parlist? ')' '{' block '}'
     ;
 
 parlist
