@@ -50,27 +50,27 @@ block
     ;
 
 stat
-    : ';'
-    | 'global' varlist '=' explist
-    | varlist '=' explist
-    | functioncall
-    | label
-    | 'break'
-    | 'continue'
-    | 'goto' NAME
-    | 'do' ':' block ';'
-    | 'while' exp ':' block ';'
-    | 'do' ':' block 'while' exp
-    | 'if' exp ':' block ('elseif' exp ':' block)* ('else' ':' block)? ';'
-    | 'for' NAME '=' exp ',' exp (',' exp)? ':' block ';'
-    | 'foreach' namelist 'in' explist ':' block ';'
-    | 'global' 'def' funcname funcbody
-    | 'def' funcname funcbody
-    | attnamelist ('=' explist)?
-    | 'switch' ':' ('case' exp ':' block)+ ('default' ':' block)? ';'
-    | 'try' ':' block ('catch' exp ':' block)+ ';'
-    | assignexp
-    | 'print' exp
+    : ';'                                                                   #sep
+    | 'global' varlist '=' explist                                          #globalVar
+    | varlist '=' explist                                                   #var
+    | functioncall                                                          #funcCall
+    | label                                                                 #statLabel
+    | 'break'                                                               #break
+    | 'continue'                                                            #continue
+    | 'goto' NAME                                                           #goto
+    | 'do' ':' block ';'                                                    #do
+    | 'while' exp ':' block ';'                                             #while
+    | 'do' ':' block 'while' exp                                            #doWhile
+    | 'if' exp ':' block ('elseif' exp ':' block)* ('else' ':' block)? ';'  #ifElse
+    | 'for' NAME '=' exp ',' exp (',' exp)? ':' block ';'                   #for
+    | 'foreach' namelist 'in' explist ':' block ';'                         #foreach
+    | 'global' 'def' funcname funcbody                                      #globalFunc
+    | 'def' funcname funcbody                                               #func
+    | attnamelist ('=' explist)?                                            #att
+    | 'switch' ':' ('case' exp ':' block)+ ('default' ':' block)? ';'       #switch
+    | 'try' ':' block ('catch' exp ':' block)+ ';'                          #tryCatch
+    | assignexp                                                             #assign
+    | 'print' exp                                                           #print
     ;
 
 importdef
@@ -115,7 +115,7 @@ varlist
     ;
 
 namelist
-    : NAME (',' NAME)*
+    : anonOrName (',' anonOrName)*
     ;
 
 explist
@@ -123,24 +123,26 @@ explist
     ;
 
 exp
-    : 'null' | 'false' | 'true'
-    | number
-    | string
-    | '...'
-    | anondef
-    | prefixexp
-    | tableconstructor
-    | <assoc=right> exp operatorPower exp
-    | operatorUnary exp
-    | 'length' exp
-    | exp operatorMulDivMod exp
-    | exp operatorAddSub exp
-    | <assoc=right> exp operatorStrcat exp
-    | exp operatorComparison exp
-    | exp operatorAnd exp
-    | exp operatorOr exp
-    | exp operatorBitwise exp
-    | assignexp
+    : 'null'                                                                #null
+    | 'false'                                                               #false
+    | 'true'                                                                #true
+    | number                                                                #number_
+    | string                                                                #string_
+    | '...'                                                                 #allArgs
+    | anondef                                                               #anondef_
+    | prefixexp                                                             #prefixexp_
+    | tableconstructor                                                      #tableconstructor_
+    | <assoc=right> exp operatorPower exp                                   #power
+    | operatorUnary exp                                                     #unary
+    | 'length' exp                                                          #length
+    | exp operatorMulDivMod exp                                             #mulDivMod
+    | exp operatorAddSub exp                                                #addSub
+    | <assoc=right> exp operatorStrcat exp                                  #concat
+    | exp operatorComparison exp                                            #compare
+    | exp operatorAnd exp                                                   #and
+    | exp operatorOr exp                                                    #or
+    | exp operatorBitwise exp                                               #bitwise
+    | assignexp                                                             #assignexp_
     ;
 
 prefixexp
@@ -179,12 +181,16 @@ anonlist
     : NAME+
     ;
 
+anonOrName
+    : NAME | anondef
+    ;
+
 funcbody
     : '(' parlist? ')' ':' block ';'
     ;
 
 parlist
-    : anondef? namelist (',' anondef)* (',' '...')? | '...'
+    : namelist (',' '...')? | '...'
     ;
 
 tableconstructor
