@@ -6,13 +6,10 @@ obj = []
 obj['x'] = 5
 
 def multiply(x, y):
-	return x * y
-;
+	return x * y;
 
 global def multiply_g(x):
-	return x * g
-;
+	return x * g;
 
 def obj:multiply_o(x):
-	return x * obj.x
-;
+	return x * obj.x;

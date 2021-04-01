@@ -39,16 +39,16 @@ public class Translator
         return translator.render();
     }
 
-    private class EluneTranslator extends EluneBaseListener
+    private static class EluneTranslator extends EluneBaseListener
     {
-        private StringBuilder translatedCode = new StringBuilder();
-        private List<String> globalScope = new ArrayList<>();
-        private Block currentBlock = new Block(null);
+        private final StringBuilder translatedCode = new StringBuilder();
+        private final List<String> globalScope = new ArrayList<>();
+        private final Block currentBlock = new Block(null);
 
         @Override
         public void enterSep(EluneParser.SepContext ctx)
         {
-            translatedCode.append(LuaRender.gen("sep", null) + "\n");
+            translatedCode.append(LuaRenderer.gen("sep", null)).append("\n");
         }
 
         @Override
@@ -76,7 +76,7 @@ public class Translator
 
             map.put("values", valueList.toArray());
 
-            translatedCode.append(LuaRender.gen("globalVar", map) + "\n");
+            translatedCode.append(LuaRenderer.gen("globalVar", map)).append("\n");
             globalScope.addAll(varList);
         }
 
@@ -115,9 +115,9 @@ public class Translator
             map.put("values", valueList.toArray());
 
             if (isDec)
-                translatedCode.append(LuaRender.gen("varDec", map) + "\n");
+                translatedCode.append(LuaRenderer.gen("varDec", map)).append("\n");
             else
-                translatedCode.append(LuaRender.gen("varAssign", map) + "\n");
+                translatedCode.append(LuaRenderer.gen("varAssign", map)).append("\n");
         }
 
         @Override
@@ -140,15 +140,15 @@ public class Translator
 
             map.put("args", args);
 
-            translatedCode.append("\n" + LuaRender.gen("globalFuncDef", map) + "\n");
-            LuaRender.increaseTab();
+            translatedCode.append("\n").append(LuaRenderer.gen("globalFuncDef", map)).append("\n");
+            LuaRenderer.increaseTab();
         }
 
         @Override
         public void exitGlobalFunc(EluneParser.GlobalFuncContext ctx)
         {
-            LuaRender.decreaseTab();
-            translatedCode.append(LuaRender.gen("end", null) + "\n");
+            LuaRenderer.decreaseTab();
+            translatedCode.append(LuaRenderer.gen("end", null)).append("\n");
         }
 
         @Override
@@ -171,15 +171,15 @@ public class Translator
 
             map.put("args", args);
 
-            translatedCode.append("\n" + LuaRender.gen("funcDef", map) + "\n");
-            LuaRender.increaseTab();
+            translatedCode.append("\n").append(LuaRenderer.gen("funcDef", map)).append("\n");
+            LuaRenderer.increaseTab();
         }
 
         @Override
         public void exitFunc(EluneParser.FuncContext ctx)
         {
-            LuaRender.decreaseTab();
-            translatedCode.append(LuaRender.gen("end", null) + "\n");
+            LuaRenderer.decreaseTab();
+            translatedCode.append(LuaRenderer.gen("end", null)).append("\n");
         }
 
         @Override
@@ -191,7 +191,7 @@ public class Translator
             map.put("y", ctx.exp(1).getText());
             map.put("symbol", ctx.operatorAddSub().getText());
 
-            translatedCode.append(LuaRender.gen("calculation", map) + "\n");
+            translatedCode.append(LuaRenderer.gen("calculation", map)).append("\n");
         }
 
         @Override
@@ -203,13 +203,13 @@ public class Translator
             map.put("y", ctx.exp(1).getText());
             map.put("symbol", ctx.operatorMulDivMod().getText());
 
-            translatedCode.append(LuaRender.gen("calculation", map) + "\n");
+            translatedCode.append(LuaRenderer.gen("calculation", map)).append("\n");
         }
 
         @Override
         public void enterRetstat(EluneParser.RetstatContext ctx)
         {
-            translatedCode.append(LuaRender.gen("return", null));
+            translatedCode.append(LuaRenderer.gen("return", null));
         }
 
         public List<String> getScope()
@@ -227,10 +227,10 @@ public class Translator
             return translatedCode.toString();
         }
 
-        private class Block
+        private static class Block
         {
-            private List<String> blockScope = new ArrayList<>();
-            private Block parentBlock = null;
+            private final List<String> blockScope = new ArrayList<>();
+            private final Block parentBlock;
 
             public Block(Block parentBlock)
             {
@@ -254,7 +254,7 @@ public class Translator
         }
     }
 
-    private static class LuaRender
+    private static class LuaRenderer
     {
         private static final STGroup stf = new STGroupFile("templates/template.stg");
         private static int tabLevel = 0;
@@ -292,7 +292,7 @@ public class Translator
         }
     }
 
-    public static void main(String args[])
+    public static void main(String[] args)
     {
         Path path = new File("./source/test_1.elu").toPath();
 
