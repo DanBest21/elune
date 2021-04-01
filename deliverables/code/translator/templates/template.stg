@@ -1,0 +1,17 @@
+sep() ::= << ; >>
+end() ::= << end >>
+return(values) ::= << return <values; separator = ", "> >>
+
+globalVar(names, values) ::= << <names; separator = ", "> = <values; separator = ", "> >>
+varDec(names, values) ::= << local <names; separator = ", "> = <values; separator = ", "> >>
+varAssign(names, values) ::= << <names; separator = ", "> = <values; separator = ", "> >>
+
+globalFuncDef(name, args) ::= << function <name>(<args; separator = ", ">) >>
+funcDef(name, args) ::= << local function <name>(<args; separator = ", ">) >>
+
+for(start, end, inc) ::= << for <start>, <end><if(inc)>, <inc><endif> do >>
+forEach(element, list) ::= << for <element> in <list> do >>
+
+string(str) ::= << "<str>" >>
+
+calculation(x, y, symbol) ::= << <x> <symbol> <y> >>
