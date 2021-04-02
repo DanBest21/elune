@@ -7,6 +7,8 @@ obj['x'] = 5
 
 global g_obj = [x = 5, y = 6]
 
+operators = [("+") = 1, ("-") = 2, ("*") = 3, ("/") = 4]
+
 def multiply(x, y)
 {
 	return x * y
@@ -17,7 +19,22 @@ global def multiply_g(x)
 	return x * g
 }
 
-def obj:multiply_o(x)
+def obj.multiply_o(x)
 {
 	return x * obj.x
+}
+
+def obj:multiply_s(x)
+{
+	return x * self.x
+}
+
+def map(f, xs)
+{
+	for i = 0, i < length xs, i += 1
+	{
+		xs[i] = f(xs[i])
+	}
+	
+	return xs
 }

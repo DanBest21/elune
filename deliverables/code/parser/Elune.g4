@@ -53,7 +53,7 @@ stat
     : ';'                                                                           #sep
     | 'global' varlist '=' explist                                                  #globalVar
     | varlist '=' explist                                                           #var
-    | functioncall                                                                  #funcCall
+    | functioncall                                                                  #functioncall_
     | label                                                                         #statLabel
     | 'break'                                                                       #break
     | 'continue'                                                                    #continue
@@ -65,7 +65,8 @@ stat
     | 'for' NAME '=' exp ',' exp (',' exp)? '{' block '}'                           #for
     | 'foreach' namelist 'in' explist '{' block '}'                                 #foreach
     | 'global' 'def' funcname funcbody                                              #globalFunc
-    | 'def' funcname funcbody                                                       #func
+    | 'def' NAME funcbody                                                           #func
+    | 'def' funcname funcbody                                                       #objFunc
     | attnamelist ('=' explist)?                                                    #att
     | 'switch' '{' ('case' exp ':' block)+ ('default' ':' block)? '}'               #switch
     | 'try' '{' block ('catch' exp ':' block)+ '}'                                  #tryCatch
@@ -83,7 +84,7 @@ libname
 
 assignexp
     : var_ compoundassign exp
-    | NAME attrib compoundassign exp
+//  | NAME attrib compoundassign exp
     ;
 
 compoundassign
@@ -129,6 +130,7 @@ exp
     | number                                                                        #number_
     | string                                                                        #string_
     | '...'                                                                         #allArgs
+    | functioncall                                                                  #functioncall__
     | anondef                                                                       #anondef_
     | prefixexp                                                                     #prefixexp_
     | tableconstructor                                                              #tableconstructor_
@@ -182,7 +184,8 @@ anonlist
     ;
 
 anonOrName
-    : NAME | anondef
+    : NAME                                                                          #name
+    | anondef                                                                       #anondef__
     ;
 
 funcbody
@@ -202,7 +205,9 @@ fieldlist
     ;
 
 field
-    : '[' exp ']' '=' exp | NAME '=' exp | exp
+    : '(' exp ')' '=' exp                                                           #exprField
+    | NAME '=' exp                                                                  #varField
+    | exp                                                                           #indexedField
     ;
 
 fieldsep

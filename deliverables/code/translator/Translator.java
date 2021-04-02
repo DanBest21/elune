@@ -45,7 +45,7 @@ public class Translator
         private final List<String> globalScope = new ArrayList<>();
         private Block currentBlock = new Block(null);
 
-        private final static EluneExprTranslator exprTranslator = new EluneExprTranslator();
+        private final static EluneExprTranslator<String> exprTranslator = new EluneExprTranslator<>();
 
         @Override
         public void enterSep(EluneParser.SepContext ctx)
@@ -63,7 +63,7 @@ public class Translator
             for (int i = 0; i < ctx.varlist().getChildCount(); i++)
             {
                 if (!ctx.varlist().getChild(i).getText().equals(","))
-                    varList.add(ctx.varlist().getChild(i).getText());
+                    varList.add(exprTranslator.visit(ctx.varlist().getChild(i)));
             }
 
             map.put("names", varList.toArray());
@@ -73,7 +73,7 @@ public class Translator
             for (int i = 0; i < ctx.explist().getChildCount(); i++)
             {
                 if (!ctx.explist().getChild(i).getText().equals(","))
-                    valueList.add((String)exprTranslator.visit(ctx.explist().getChild(i)));
+                    valueList.add(exprTranslator.visit(ctx.explist().getChild(i)));
             }
 
             map.put("values", valueList.toArray());
@@ -93,14 +93,14 @@ public class Translator
 
             for (int i = 0; i < ctx.varlist().getChildCount(); i++)
             {
-                String varName = ctx.varlist().getChild(i).getText();
+                String varName = ctx.varlist().getChild(i).getText().equals(",") ? "," : exprTranslator.visit(ctx.varlist().getChild(i));
 
                 if (scope.contains(varName.split("\\[")[0]))
                     isDec = false;
                 else
                     currentBlock.putVarInScope(varName);
 
-                if (!ctx.varlist().getChild(i).getText().equals(","))
+                if (!varName.equals(","))
                     varList.add(varName);
             }
 
@@ -111,7 +111,7 @@ public class Translator
             for (int i = 0; i < ctx.explist().getChildCount(); i++)
             {
                 if (!ctx.explist().getChild(i).getText().equals(","))
-                    valueList.add((String)exprTranslator.visit(ctx.explist().getChild(i)));
+                    valueList.add(exprTranslator.visit(ctx.explist().getChild(i)));
             }
 
             map.put("values", valueList.toArray());
@@ -136,7 +136,7 @@ public class Translator
             {
                 if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
                 {
-                    String arg = ctx.funcbody().parlist().namelist().getChild(i).getText();
+                    String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
                     args.add(arg);
                     newBlock.putVarInScope(arg);
                 }
@@ -165,7 +165,7 @@ public class Translator
         {
             Map<String, Object> map = new HashMap<>();
 
-            map.put("name", ctx.funcname().getText());
+            map.put("name", ctx.NAME().getText());
             Block newBlock = new Block(currentBlock);
 
             List<String> args = new ArrayList<>();
@@ -174,7 +174,7 @@ public class Translator
             {
                 if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
                 {
-                    String arg = ctx.funcbody().parlist().namelist().getChild(i).getText();
+                    String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
                     args.add(arg);
                     newBlock.putVarInScope(arg);
                 }
@@ -199,11 +199,82 @@ public class Translator
         }
 
         @Override
+        public void enterObjFunc(EluneParser.ObjFuncContext ctx)
+        {
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("name", ctx.funcname().getText());
+            Block newBlock = new Block(currentBlock);
+
+            List<String> args = new ArrayList<>();
+
+            for (int i = 0; i < ctx.funcbody().parlist().namelist().getChildCount(); i++)
+            {
+                if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
+                {
+                    String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
+                    args.add(arg);
+                    newBlock.putVarInScope(arg);
+                }
+            }
+
+            if (ctx.funcbody().parlist().getChildCount() > 1)
+                args.add("...");
+
+            map.put("args", args);
+
+            translatedCode.append("\n").append(LuaRenderer.gen("globalFuncDef", map)).append("\n");
+            LuaRenderer.increaseTab();
+            currentBlock = newBlock;
+        }
+
+        @Override
+        public void exitObjFunc(EluneParser.ObjFuncContext ctx)
+        {
+            LuaRenderer.decreaseTab();
+            currentBlock = currentBlock.parentBlock;
+            translatedCode.append(LuaRenderer.gen("end", null)).append("\n");
+        }
+
+        @Override
         public void enterFor(EluneParser.ForContext ctx)
         {
             Map<String, Object> map = new HashMap<>();
 
-            // map.put()
+            Block newBlock = new Block(currentBlock);
+
+            map.put("var", ctx.NAME().getText());
+            newBlock.putVarInScope(ctx.NAME().getText());
+
+            map.put("start", exprTranslator.visit(ctx.exp(0)));
+            map.put("end", exprTranslator.visit(ctx.exp(1)));
+            map.put("inc", exprTranslator.visit(ctx.exp(2)));
+
+            translatedCode.append(LuaRenderer.gen("for", map)).append("\n");
+            LuaRenderer.increaseTab();
+        }
+
+        @Override
+        public void exitFor(EluneParser.ForContext ctx)
+        {
+            LuaRenderer.decreaseTab();
+            currentBlock = currentBlock.parentBlock;
+            translatedCode.append(LuaRenderer.gen("end", null)).append("\n\n");
+        }
+
+        @Override
+        public void enterIfElse(EluneParser.IfElseContext ctx)
+        {
+            // TODO: Complete this.
+        }
+
+        @Override
+        public void enterFunctioncall(EluneParser.FunctioncallContext ctx)
+        {
+            if (ctx.getParent() instanceof EluneParser.StatContext)
+            {
+                translatedCode.append(exprTranslator.visit(ctx)).append("\n");
+            }
         }
 
         @Override
@@ -217,7 +288,7 @@ public class Translator
                 for (int i = 0; i < ctx.explist().getChildCount(); i++)
                 {
                     if (!ctx.explist().getChild(i).getText().equals(",") || !ctx.explist().getChild(i).getText().equals(" "))
-                        values.add((String)exprTranslator.visit(ctx.explist().getChild(i)));
+                        values.add(exprTranslator.visit(ctx.explist().getChild(i)));
                 }
             }
 
@@ -271,7 +342,25 @@ public class Translator
     private static class EluneExprTranslator<String> extends EluneBaseVisitor<java.lang.String>
     {
         @Override
+        public java.lang.String visitName(EluneParser.NameContext ctx)
+        {
+            return ctx.NAME().getText();
+        }
+
+        @Override
         public java.lang.String visitNumber(EluneParser.NumberContext ctx)
+        {
+            return ctx.getText();
+        }
+
+        @Override
+        public java.lang.String visitString(EluneParser.StringContext ctx)
+        {
+            return ctx.getText();
+        }
+
+        @Override
+        public java.lang.String visitVar_(EluneParser.Var_Context ctx)
         {
             return ctx.getText();
         }
@@ -299,9 +388,21 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitField(EluneParser.FieldContext ctx)
+        public java.lang.String visitExprField(EluneParser.ExprFieldContext ctx)
         {
-            return "";
+            return "[" + this.visit(ctx.exp(0)) + "] = " + this.visit(ctx.exp(1));
+        }
+
+        @Override
+        public java.lang.String visitVarField(EluneParser.VarFieldContext ctx)
+        {
+            return ctx.NAME().getText() + " = " + this.visit(ctx.exp());
+        }
+
+        @Override
+        public java.lang.String visitIndexedField(EluneParser.IndexedFieldContext ctx)
+        {
+            return this.visit(ctx.exp());
         }
 
         @Override
@@ -311,15 +412,31 @@ public class Translator
         }
 
         @Override
+        public java.lang.String visitLength(EluneParser.LengthContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("var", this.visit(ctx.exp()));
+
+            return LuaRenderer.gen("len", map, true);
+        }
+
+        @Override
+        public java.lang.String visitFunctioncall(EluneParser.FunctioncallContext ctx)
+        {
+            return ctx.getText();
+        }
+
+        @Override
         public java.lang.String visitAddSub(EluneParser.AddSubContext ctx)
         {
             Map<java.lang.String, Object> map = new HashMap<>();
 
-            map.put("x", ctx.exp(0).getText());
-            map.put("y", ctx.exp(1).getText());
+            map.put("x", this.visit(ctx.exp(0)));
+            map.put("y", this.visit(ctx.exp(1)));
             map.put("symbol", ctx.operatorAddSub().getText());
 
-            return LuaRenderer.gen("calculation", map);
+            return LuaRenderer.gen("operatorExpr", map, true);
         }
 
         @Override
@@ -327,12 +444,45 @@ public class Translator
         {
             Map<java.lang.String, Object> map = new HashMap<>();
 
-            map.put("x", ctx.exp(0).getText());
-            map.put("y", ctx.exp(1).getText());
+            map.put("x", this.visit(ctx.exp(0)));
+            map.put("y", this.visit(ctx.exp(1)));
             map.put("symbol", ctx.operatorMulDivMod().getText());
 
-            return LuaRenderer.gen("calculation", map);
+            return LuaRenderer.gen("operatorExpr", map, true);
         }
+
+        @Override
+        public java.lang.String visitCompare(EluneParser.CompareContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("x", this.visit(ctx.exp(0)));
+            map.put("y", this.visit(ctx.exp(1)));
+            map.put("symbol", ctx.operatorComparison().getText());
+
+            return LuaRenderer.gen("operatorExpr", map, true);
+        }
+
+        @Override
+        public java.lang.String visitAssignexp(EluneParser.AssignexpContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("x", this.visit(ctx.var_()));
+            map.put("y", this.visit(ctx.exp()));
+            map.put("symbol", ctx.compoundassign().getText().replace("=", ""));
+
+            return LuaRenderer.gen("compoundAssign", map, true);
+        }
+    }
+
+    private static class EluneForTranslator<String> extends EluneBaseVisitor<java.lang.String>
+    {
+//        @Override
+//        public java.lang.String visitCompare(EluneParser.CompareContext ctx)
+//        {
+//
+//        }
     }
 
     private static class LuaRenderer
@@ -341,6 +491,11 @@ public class Translator
         private static int tabLevel = 0;
 
         public static String gen(String name, Map<String, Object> varMap)
+        {
+            return gen(name, varMap, false);
+        }
+
+        public static String gen(String name, Map<String, Object> varMap, boolean isExpression)
         {
             final ST st = stf.getInstanceOf(name);
 
@@ -359,7 +514,10 @@ public class Translator
                 }
             }
 
-            return "\t".repeat(tabLevel) + st.render().trim();
+            if (isExpression)
+                return st.render().trim();
+            else
+                return "\t".repeat(tabLevel) + st.render().trim();
         }
 
         public static void increaseTab()

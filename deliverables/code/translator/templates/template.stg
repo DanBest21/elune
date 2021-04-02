@@ -9,9 +9,14 @@ varAssign(names, values) ::= << <names; separator = ", "> = <values; separator =
 globalFuncDef(name, args) ::= << function <name>(<args; separator = ", ">) >>
 funcDef(name, args) ::= << local function <name>(<args; separator = ", ">) >>
 
-for(start, end, inc) ::= << for <start>, <end><if(inc)>, <inc><endif> do >>
+for(var, start, end, inc) ::= << for <var> = <start>, <end><if(inc)>, <inc><endif> do >>
 forEach(element, list) ::= << for <element> in <list> do >>
 
-string(str) ::= << "<str>" >>
+if(cond) ::= << if <cond> >>
+elseIf(cond) ::= << else if <cond> >>
+else(cond) ::= << else <cond> >>
 
-calculation(x, y, symbol) ::= << <x> <symbol> <y> >>
+operatorExpr(x, y, symbol) ::= << <x> <symbol> <y> >>
+compoundAssign(x, y, symbol) ::= << <x> = <x> <symbol> <y> >>
+
+len(var) ::= << #<var> >>

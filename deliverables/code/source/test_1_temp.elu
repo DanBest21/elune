@@ -1,13 +1,3 @@
-def map(f, xs)
-{
-	for i = 0, i < length xs, i += 1
-	{
-		xs[i] = f(xs[i])
-	}
-	
-	return xs
-}
-
 def filter(b, xs)
 {
 	ys = []
