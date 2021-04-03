@@ -38,3 +38,25 @@ def map(f, xs)
 	
 	return xs
 }
+
+def filter(b, xs)
+{
+	ys = []
+	i = 0
+	
+	foreach x in xs
+	{
+		if b(x)
+		{
+			ys[i] = x
+			i += 1
+		}
+	}
+}
+
+xs = map(multiply_g, [1, 2, 3, 4, 5])
+
+foreach x in xs
+{
+	print(x)
+}

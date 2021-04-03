@@ -61,9 +61,9 @@ stat
     | 'do' '{' block '}'                                                            #do
     | 'while' exp '{' block '}'                                                     #while
     | 'do' '{' block '}' 'while' exp                                                #doWhile
-    | 'if' exp '{' block '}' ('elseif' exp '{' block '}')* ('else' '{' block '}')?  #ifElse
+    | ifStmt elseIfStmt* elseStmt?                                                  #ifElse
     | 'for' NAME '=' exp ',' exp (',' exp)? '{' block '}'                           #for
-    | 'foreach' namelist 'in' explist '{' block '}'                                 #foreach
+    | 'foreach' NAME 'in' explist '{' block '}'                                     #foreach
     | 'global' 'def' funcname funcbody                                              #globalFunc
     | 'def' NAME funcbody                                                           #func
     | 'def' funcname funcbody                                                       #objFunc
@@ -71,6 +71,7 @@ stat
     | 'switch' '{' ('case' exp ':' block)+ ('default' ':' block)? '}'               #switch
     | 'try' '{' block ('catch' exp ':' block)+ '}'                                  #tryCatch
     | assignexp                                                                     #assign
+    | 'print' '(' exp ')'                                                           #printBrackets
     | 'print' exp                                                                   #print
     ;
 
@@ -123,6 +124,18 @@ explist
     : exp (',' exp)*
     ;
 
+ifStmt
+    : 'if' exp '{' block '}'
+    ;
+
+elseIfStmt
+    : 'elseif' exp '{' block '}'
+    ;
+
+elseStmt
+    : 'else' '{' block '}'
+    ;
+
 exp
     : 'null'                                                                        #null
     | 'false'                                                                       #false
@@ -130,12 +143,12 @@ exp
     | number                                                                        #number_
     | string                                                                        #string_
     | '...'                                                                         #allArgs
-    | functioncall                                                                  #functioncall__
     | anondef                                                                       #anondef_
     | prefixexp                                                                     #prefixexp_
     | tableconstructor                                                              #tableconstructor_
     | <assoc=right> exp operatorPower exp                                           #power
     | operatorUnary exp                                                             #unary
+    | 'length' '(' exp ')'                                                          #lengthBrackets
     | 'length' exp                                                                  #length
     | exp operatorMulDivMod exp                                                     #mulDivMod
     | exp operatorAddSub exp                                                        #addSub
@@ -172,7 +185,9 @@ nameAndArgs
     ;
 
 args
-    : '(' explist? ')' | tableconstructor | string
+    : '(' explist? ')'                                                              #exprArgs
+    | tableconstructor                                                              #tableconstructorArgs
+    | string                                                                        #stringArgs
     ;
 
 anondef
