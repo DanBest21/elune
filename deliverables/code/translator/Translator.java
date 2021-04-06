@@ -29,40 +29,74 @@ public class Translator
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         EluneParser parser = new EluneParser(tokens);
 
-        EluneTranslator translator = new EluneTranslator();
+        EluneTranslator translator = new EluneTranslator(false);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(translator, parser.root());
 
         return translator.render();
     }
 
-    private static class EluneTranslator extends EluneBaseListener
+    private class EluneTranslator extends EluneBaseListener
     {
-        private static final StringBuilder translatedCode = new StringBuilder();
-        private static final List<String> globalScope = new ArrayList<>();
-        private static Block currentBlock = new Block(null);
+        private final StringBuilder translatedCode = new StringBuilder();
+        private final List<String> globalScope = new ArrayList<>();
+        private Block currentBlock = new Block(null);
 
-        private final static EluneExprTranslator<String> exprTranslator = new EluneExprTranslator<>();
+        private boolean insideBlock = false;
+        private boolean innerTranslator;
 
-        public static Block getCurrentBlock()
+        private final EluneExprTranslator<String> exprTranslator = new EluneExprTranslator<>(this);
+
+        public EluneTranslator(boolean innerTranslator)
+        {
+            this.innerTranslator = innerTranslator;
+        }
+
+        public Block getCurrentBlock()
         {
             return currentBlock;
         }
 
-        public static void setCurrentBlock(Block newBlock)
+        public void setCurrentBlock(Block newBlock)
         {
             currentBlock = newBlock;
         }
 
+        public void toggleInsideBlock() { insideBlock = !insideBlock; }
+
         @Override
         public void enterSep(EluneParser.SepContext ctx)
         {
-            translatedCode.append(Renderer.gen("sep", null)).append("\n");
+            translatedCode.append(Renderer.gen("sep", null, true));
+
+            if (!innerTranslator)
+                translatedCode.append("\n");
+        }
+
+        @Override
+        public void enterBreak(EluneParser.BreakContext ctx)
+        {
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("break", null, true));
+            else
+                translatedCode.append(Renderer.gen("break", null)).append("\n");
+        }
+
+        @Override
+        public void enterContinue(EluneParser.ContinueContext ctx)
+        {
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("continue", null, true));
+            else
+                translatedCode.append(Renderer.gen("continue", null)).append("\n");
         }
 
         @Override
         public void enterGlobalVar(EluneParser.GlobalVarContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             List<String> varList = new ArrayList<>();
@@ -85,13 +119,20 @@ public class Translator
 
             map.put("values", valueList.toArray());
 
-            translatedCode.append(Renderer.gen("globalVar", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("globalVar", map, true));
+            else
+                translatedCode.append(Renderer.gen("globalVar", map)).append("\n");
+
             globalScope.addAll(varList);
         }
 
         @Override
         public void enterVar(EluneParser.VarContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
             boolean isDec = true;
             List<String> scope = getScope();
@@ -123,15 +164,25 @@ public class Translator
 
             map.put("values", valueList.toArray());
 
+            String templateName = "";
+
             if (isDec)
-                translatedCode.append(Renderer.gen("varDec", map)).append("\n");
+                templateName = "varDec";
             else
-                translatedCode.append(Renderer.gen("varAssign", map)).append("\n");
+                templateName = "varAssign";
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen(templateName, map, true));
+            else
+                translatedCode.append(Renderer.gen(templateName, map)).append("\n");
         }
 
         @Override
         public void enterGlobalFunc(EluneParser.GlobalFuncContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             map.put("name", ctx.funcname().getText());
@@ -154,7 +205,11 @@ public class Translator
 
             map.put("args", args);
 
-            translatedCode.append("\n").append(Renderer.gen("globalFuncDef", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("globalFuncDef", map, true));
+            else
+                translatedCode.append("\n").append(Renderer.gen("globalFuncDef", map)).append("\n");
+
             Renderer.increaseTab();
             currentBlock = newBlock;
         }
@@ -162,14 +217,24 @@ public class Translator
         @Override
         public void exitGlobalFunc(EluneParser.GlobalFuncContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
-            translatedCode.append(Renderer.gen("end", null)).append("\n");
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+            else
+                translatedCode.append(Renderer.gen("end", null)).append("\n");
         }
 
         @Override
         public void enterFunc(EluneParser.FuncContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             map.put("name", ctx.NAME().getText());
@@ -192,7 +257,11 @@ public class Translator
 
             map.put("args", args);
 
-            translatedCode.append("\n").append(Renderer.gen("funcDef", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("funcDef", map, true));
+            else
+                translatedCode.append("\n").append(Renderer.gen("funcDef", map)).append("\n");
+
             Renderer.increaseTab();
             currentBlock = newBlock;
         }
@@ -200,14 +269,24 @@ public class Translator
         @Override
         public void exitFunc(EluneParser.FuncContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
-            translatedCode.append(Renderer.gen("end", null)).append("\n");
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+            else
+                translatedCode.append(Renderer.gen("end", null)).append("\n");
         }
 
         @Override
         public void enterObjFunc(EluneParser.ObjFuncContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             map.put("name", ctx.funcname().getText());
@@ -230,7 +309,11 @@ public class Translator
 
             map.put("args", args);
 
-            translatedCode.append("\n").append(Renderer.gen("globalFuncDef", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("globalFuncDef", map, true));
+            else
+                translatedCode.append("\n").append(Renderer.gen("globalFuncDef", map)).append("\n");
+
             Renderer.increaseTab();
             currentBlock = newBlock;
         }
@@ -238,22 +321,134 @@ public class Translator
         @Override
         public void exitObjFunc(EluneParser.ObjFuncContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
-            translatedCode.append(Renderer.gen("end", null)).append("\n");
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+            else
+                translatedCode.append(Renderer.gen("end", null)).append("\n");
         }
 
         @Override
         public void exitAnondef(EluneParser.AnondefContext ctx)
         {
+            toggleInsideBlock();
+        }
+
+        @Override
+        public void enterDo(EluneParser.DoContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            Block newBlock = new Block(currentBlock);
+
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("do", null, true));
+            else
+                translatedCode.append(Renderer.gen("do", null)).append("\n");
+
+            Renderer.increaseTab();
+            currentBlock = newBlock;
+        }
+
+        @Override
+        public void exitDo(EluneParser.DoContext ctx)
+        {
+            if (insideBlock)
+                return;
+
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
-            translatedCode.append(Renderer.gen("end", null)).append("\n");
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+            else
+                translatedCode.append(Renderer.gen("end", null)).append("\n\n");
+        }
+
+        @Override
+        public void enterDoWhile(EluneParser.DoWhileContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            Block newBlock = new Block(currentBlock);
+
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("doWhile", null, true));
+            else
+                translatedCode.append(Renderer.gen("doWhile", null)).append("\n");
+
+            Renderer.increaseTab();
+            currentBlock = newBlock;
+        }
+
+        @Override
+        public void exitDoWhile(EluneParser.DoWhileContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("cond", exprTranslator.visit(ctx.exp()));
+
+            Renderer.decreaseTab();
+            currentBlock = currentBlock.parentBlock;
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("doWhileEnd", map, true));
+            else
+                translatedCode.append(Renderer.gen("doWhileEnd", map)).append("\n\n");
+        }
+
+        @Override
+        public void enterWhile(EluneParser.WhileContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            Map<String, Object> map = new HashMap<>();
+
+            Block newBlock = new Block(currentBlock);
+
+            map.put("cond", exprTranslator.visit(ctx.exp()));
+
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("while", map, true));
+            else
+                translatedCode.append(Renderer.gen("while", map)).append("\n");
+
+            Renderer.increaseTab();
+            currentBlock = newBlock;
+        }
+
+        @Override
+        public void exitWhile(EluneParser.WhileContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            Renderer.decreaseTab();
+            currentBlock = currentBlock.parentBlock;
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", null, true));
+            else
+                translatedCode.append(Renderer.gen("loopEnd", null)).append("\n\n");
         }
 
         @Override
         public void enterFor(EluneParser.ForContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             Block newBlock = new Block(currentBlock);
@@ -265,7 +460,11 @@ public class Translator
             map.put("end", exprTranslator.visit(ctx.exp(1)));
             map.put("inc", exprTranslator.visit(ctx.exp(2)));
 
-            translatedCode.append(Renderer.gen("for", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("for", map, true));
+            else
+                translatedCode.append(Renderer.gen("for", map)).append("\n");
+
             Renderer.increaseTab();
             currentBlock = newBlock;
         }
@@ -273,14 +472,24 @@ public class Translator
         @Override
         public void exitFor(EluneParser.ForContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
-            translatedCode.append(Renderer.gen("end", null)).append("\n\n");
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", null, true));
+            else
+                translatedCode.append(Renderer.gen("loopEnd", null)).append("\n\n");
         }
 
         @Override
         public void enterForeach(EluneParser.ForeachContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             Block newBlock = new Block(currentBlock);
@@ -288,7 +497,11 @@ public class Translator
             map.put("element", ctx.NAME().getText());
             map.put("list", exprTranslator.visit(ctx.explist()));
 
-            translatedCode.append(Renderer.gen("forEach", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("forEach", map, true));
+            else
+                translatedCode.append(Renderer.gen("forEach", map)).append("\n");
+
             Renderer.increaseTab();
             currentBlock = newBlock;
         }
@@ -296,73 +509,125 @@ public class Translator
         @Override
         public void exitForeach(EluneParser.ForeachContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
-            translatedCode.append(Renderer.gen("end", null)).append("\n\n");
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", null, true));
+            else
+                translatedCode.append(Renderer.gen("loopEnd", null)).append("\n\n");
         }
 
         @Override
         public void enterIfStmt(EluneParser.IfStmtContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             Block newBlock = new Block(currentBlock);
 
             map.put("cond", exprTranslator.visit(ctx.exp()));
 
-            translatedCode.append(Renderer.gen("if", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("if", map, true));
+            else
+                translatedCode.append(Renderer.gen("if", map)).append("\n");
+
             Renderer.increaseTab();
             currentBlock = newBlock;
         }
 
+        @Override
         public void exitIfStmt(EluneParser.IfStmtContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
-            translatedCode.append(Renderer.gen("end", null)).append("\n\n");
         }
 
         @Override
         public void enterElseIfStmt(EluneParser.ElseIfStmtContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             Block newBlock = new Block(currentBlock);
 
             map.put("cond", exprTranslator.visit(ctx.exp()));
 
-            translatedCode.append(Renderer.gen("elseIf", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("elseIf", map, true));
+            else
+                translatedCode.append(Renderer.gen("elseIf", map)).append("\n");
+
             Renderer.increaseTab();
             currentBlock = newBlock;
         }
 
+        @Override
         public void exitElseIfStmt(EluneParser.ElseIfStmtContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
-            translatedCode.append(Renderer.gen("end", null)).append("\n\n");
         }
 
         @Override
         public void enterElseStmt(EluneParser.ElseStmtContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Block newBlock = new Block(currentBlock);
 
-            translatedCode.append(Renderer.gen("else", null)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("else", null, true));
+            else
+                translatedCode.append(Renderer.gen("else", null)).append("\n");
+
             Renderer.increaseTab();
             currentBlock = newBlock;
         }
 
+        @Override
         public void exitElseStmt(EluneParser.ElseStmtContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
-            translatedCode.append(Renderer.gen("end", null)).append("\n\n");
+        }
+
+        @Override
+        public void exitIfElse(EluneParser.IfElseContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+            else
+                translatedCode.append(Renderer.gen("end", null)).append("\n\n");
         }
 
         @Override
         public void enterFunctioncall(EluneParser.FunctioncallContext ctx)
         {
+            if (insideBlock)
+                return;
+
             StringBuilder functionCall = new StringBuilder();
             functionCall.append(exprTranslator.visit(ctx.varOrExp()));
 
@@ -381,35 +646,68 @@ public class Translator
 
                 map.put("args", args);
 
-                functionCall.append(Renderer.gen("prefixExp", map));
+                if (innerTranslator)
+                    functionCall.append(Renderer.gen("prefixExp", map, true));
+                else
+                    functionCall.append(Renderer.gen("prefixExp", map));
             }
 
-            translatedCode.append(functionCall).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(functionCall);
+            else
+                translatedCode.append(functionCall).append("\n");
+        }
+
+        @Override
+        public void enterAssign(EluneParser.AssignContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(exprTranslator.visit(ctx));
+            else
+                translatedCode.append(Renderer.getTab()).append(exprTranslator.visit(ctx)).append("\n");
         }
 
         @Override
         public void enterPrint(EluneParser.PrintContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             map.put("exp", exprTranslator.visit(ctx.exp()));
 
-            translatedCode.append(Renderer.gen("print", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("print", map, true));
+            else
+                translatedCode.append(Renderer.gen("print", map)).append("\n");
         }
 
         @Override
         public void enterPrintBrackets(EluneParser.PrintBracketsContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
 
             map.put("exp", exprTranslator.visit(ctx.exp()));
 
-            translatedCode.append(Renderer.gen("print", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("print", map, true));
+            else
+                translatedCode.append(Renderer.gen("print", map)).append("\n");
         }
 
         @Override
         public void enterRetstat(EluneParser.RetstatContext ctx)
         {
+            if (insideBlock)
+                return;
+
             Map<String, Object> map = new HashMap<>();
             List<String> values = new ArrayList<>();
 
@@ -424,7 +722,10 @@ public class Translator
 
             map.put("values", values);
 
-            translatedCode.append(Renderer.gen("return", map)).append("\n");
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("return", map, true));
+            else
+                translatedCode.append(Renderer.gen("return", map)).append("\n");
         }
 
         public List<String> getScope()
@@ -441,36 +742,43 @@ public class Translator
         {
             return translatedCode.toString();
         }
+    }
 
-        private static class Block
+    private class Block
+    {
+        private final List<String> blockScope = new ArrayList<>();
+        private final Block parentBlock;
+
+        public Block(Block parentBlock)
         {
-            private final List<String> blockScope = new ArrayList<>();
-            private final Block parentBlock;
+            this.parentBlock = parentBlock;
+        }
 
-            public Block(Block parentBlock)
-            {
-                this.parentBlock = parentBlock;
-            }
+        public void putVarInScope(String varName)
+        {
+            blockScope.add(varName);
+        }
 
-            public void putVarInScope(String varName)
-            {
-                blockScope.add(varName);
-            }
+        public List<String> getScope()
+        {
+            List<String> scope = new ArrayList<>(blockScope);
 
-            public List<String> getScope()
-            {
-                List<String> scope = new ArrayList<>(blockScope);
+            if (parentBlock != null)
+                scope.addAll(parentBlock.getScope());
 
-                if (parentBlock != null)
-                    scope.addAll(parentBlock.getScope());
-
-                return scope;
-            }
+            return scope;
         }
     }
 
-    private static class EluneExprTranslator<String> extends EluneBaseVisitor<java.lang.String>
+    private class EluneExprTranslator<String> extends EluneBaseVisitor<java.lang.String>
     {
+        private EluneTranslator translator;
+
+        public EluneExprTranslator(EluneTranslator translator)
+        {
+            this.translator = translator;
+        }
+
         @Override
         public java.lang.String visitName(EluneParser.NameContext ctx)
         {
@@ -488,6 +796,15 @@ public class Translator
         {
             return ctx.getText();
         }
+
+        @Override
+        public java.lang.String visitTrue(EluneParser.TrueContext ctx) { return "true"; }
+
+        @Override
+        public java.lang.String visitFalse(EluneParser.FalseContext ctx) { return "false"; }
+
+        @Override
+        public java.lang.String visitNull(EluneParser.NullContext ctx) { return "nil"; }
 
         @Override
         public java.lang.String visitVar_(EluneParser.Var_Context ctx)
@@ -588,13 +905,13 @@ public class Translator
             return functionCall.toString();
         }
 
-        // TODO: Fix anonymous functions since they are horrendously broken right now.
         @Override
         public java.lang.String visitAnondef(EluneParser.AnondefContext ctx)
         {
             Map<java.lang.String, Object> map = new HashMap<>();
 
-            EluneTranslator.Block newBlock = new EluneTranslator.Block(EluneTranslator.getCurrentBlock());
+            EluneTranslator insideTranslator = new EluneTranslator(true);
+            Block newBlock = new Block(translator.getCurrentBlock());
 
             List<java.lang.String> args = new ArrayList<>();
 
@@ -607,10 +924,13 @@ public class Translator
 
             map.put("args", args);
 
-            Renderer.increaseTab();
-            EluneTranslator.setCurrentBlock(newBlock);
+            insideTranslator.setCurrentBlock(newBlock);
+            translator.toggleInsideBlock();
 
-            return Renderer.gen("anonFuncDef", map,true);
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.walk(insideTranslator, ctx.block());
+
+            return Renderer.gen("anonFuncDef", map, true) + insideTranslator.render() + " " + Renderer.gen("end", null, true);
         }
 
         @Override
@@ -627,6 +947,54 @@ public class Translator
             map.put("args", args);
 
             return Renderer.gen("funcCall", map, true);
+        }
+
+        @Override
+        public java.lang.String visitConcat(EluneParser.ConcatContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("x", this.visit(ctx.exp(0)));
+            map.put("y", this.visit(ctx.exp(1)));
+            map.put("symbol", "..");
+
+            return Renderer.gen("operatorExpr", map, true);
+        }
+
+        @Override
+        public java.lang.String visitAnd(EluneParser.AndContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("x", this.visit(ctx.exp(0)));
+            map.put("y", this.visit(ctx.exp(1)));
+            map.put("symbol", "and");
+
+            return Renderer.gen("operatorExpr", map, true);
+        }
+
+        @Override
+        public java.lang.String visitOr(EluneParser.OrContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("x", this.visit(ctx.exp(0)));
+            map.put("y", this.visit(ctx.exp(1)));
+            map.put("symbol", "or");
+
+            return Renderer.gen("operatorExpr", map, true);
+        }
+
+        @Override
+        public java.lang.String visitBitwise(EluneParser.BitwiseContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("x", this.visit(ctx.exp(0)));
+            map.put("y", this.visit(ctx.exp(1)));
+            map.put("symbol", ctx.operatorBitwise().getText());
+
+            return Renderer.gen("operatorExpr", map, true);
         }
 
         @Override
@@ -649,6 +1017,29 @@ public class Translator
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
             map.put("symbol", ctx.operatorMulDivMod().getText());
+
+            return Renderer.gen("operatorExpr", map, true);
+        }
+
+        @Override
+        public java.lang.String visitUnary(EluneParser.UnaryContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("y", this.visit(ctx.exp()));
+            map.put("symbol", ctx.operatorUnary().getText());
+
+            return Renderer.gen("unaryOperatorExpr", map, true);
+        }
+
+        @Override
+        public java.lang.String visitPower(EluneParser.PowerContext ctx)
+        {
+            Map<java.lang.String, Object> map = new HashMap<>();
+
+            map.put("x", this.visit(ctx.exp(0)));
+            map.put("y", this.visit(ctx.exp(1)));
+            map.put("symbol", ctx.operatorPower().getText());
 
             return Renderer.gen("operatorExpr", map, true);
         }
@@ -718,12 +1109,14 @@ public class Translator
 
                 for (String line : lines)
                 {
-                    output.append("\t".repeat(tabLevel)).append(line);
+                    output.append(getTab()).append(line);
                 }
 
                 return output.toString();
             }
         }
+
+        public static String getTab() { return "\t".repeat(tabLevel); }
 
         public static void increaseTab()
         {

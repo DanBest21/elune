@@ -230,10 +230,10 @@ fieldsep
     ;
 
 operatorOr
-	: 'or';
+	: 'or' | '||';
 
 operatorAnd
-	: 'and';
+	: 'and' | '&&';
 
 operatorComparison
 	: '<' | '>' | '<=' | '>=' | '~=' | '==' | 'is';
