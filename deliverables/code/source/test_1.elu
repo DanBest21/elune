@@ -172,7 +172,6 @@ do
 print 3 ^ 3
 print -10 * 10
 print true and not true 
-*/
 
 print 3 & 5
 print 3 | 5
@@ -180,3 +179,54 @@ print 3 ~ 5
 print 7 >> 1
 print 7 << 1
 print ~7
+
+var = true
+var2 = 1
+
+switch var
+{
+	case true
+	{
+		switch var2
+		{
+			case 1
+			{
+				print "It works!"
+			}
+			case 2
+			{
+				print "???"
+			}
+			default
+			{
+				print "Nope!"
+			}
+		}
+	}
+	case false
+	{
+		print "False"
+	}
+	default
+	{
+		print "Invalid"
+	}
+}
+
+i = 0
+loops = 0
+
+while i < 10
+{
+	for j = 0, j < 5, j += 1
+	{
+		loops += 1
+		
+		if j % 2 == 0 { continue }
+		
+		i += 1
+	}
+}
+
+print loops
+*/

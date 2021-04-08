@@ -50,29 +50,29 @@ block
     ;
 
 stat
-    : ';'                                                                           #sep
-    | 'global' varlist '=' explist                                                  #globalVar
-    | varlist '=' explist                                                           #var
-    | functioncall                                                                  #functioncall_
-    | label                                                                         #statLabel
-    | 'break'                                                                       #break
-    | 'continue'                                                                    #continue
-    | 'goto' NAME                                                                   #goto
-    | 'do' '{' block '}'                                                            #do
-    | 'while' exp '{' block '}'                                                     #while
-    | 'do' '{' block '}' 'while' exp                                                #doWhile
-    | ifStmt elseIfStmt* elseStmt?                                                  #ifElse
-    | 'for' NAME '=' exp ',' exp (',' exp)? '{' block '}'                           #for
-    | 'foreach' NAME 'in' explist '{' block '}'                                     #foreach
-    | 'global' 'def' funcname funcbody                                              #globalFunc
-    | 'def' NAME funcbody                                                           #func
-    | 'def' funcname funcbody                                                       #objFunc
-    | attnamelist ('=' explist)?                                                    #att
-    | 'switch' '{' ('case' exp ':' block)+ ('default' ':' block)? '}'               #switch
-    | 'try' '{' block ('catch' exp ':' block)+ '}'                                  #tryCatch
-    | assignexp                                                                     #assign
-    | 'print' '(' exp ')'                                                           #printBrackets
-    | 'print' exp                                                                   #print
+    : ';'                                                                               #sep
+    | 'global' varlist '=' explist                                                      #globalVar
+    | varlist '=' explist                                                               #var
+    | functioncall                                                                      #functioncall_
+    | label                                                                             #statLabel
+    | 'break'                                                                           #break
+    | 'continue'                                                                        #continue
+    | 'goto' NAME                                                                       #goto
+    | 'do' '{' block '}'                                                                #do
+    | 'while' exp '{' block '}'                                                         #while
+    | 'do' '{' block '}' 'while' exp                                                    #doWhile
+    | ifStmt elseIfStmt* elseStmt?                                                      #ifElse
+    | 'for' NAME '=' exp ',' exp (',' exp)? '{' block '}'                               #for
+    | 'foreach' NAME 'in' explist '{' block '}'                                         #foreach
+    | 'global' 'def' funcname funcbody                                                  #globalFunc
+    | 'def' NAME funcbody                                                               #func
+    | 'def' funcname funcbody                                                           #objFunc
+    | attnamelist ('=' explist)?                                                        #att
+    | 'switch' var_ '{' ('case' exp '{' block '}')+ ('default' '{' block '}')? '}'      #switch
+    | 'try' '{' block '}' ('catch' exp '{' block '}')+ ('finally' exp '{' block '}')?   #tryCatch
+    | assignexp                                                                         #assign
+    | 'print' '(' exp ')'                                                               #printBrackets
+    | 'print' exp                                                                       #print
     ;
 
 importdef
@@ -137,27 +137,27 @@ elseStmt
     ;
 
 exp
-    : 'null'                                                                        #null
-    | 'false'                                                                       #false
-    | 'true'                                                                        #true
-    | number                                                                        #number_
-    | string                                                                        #string_
-    | '...'                                                                         #allArgs
-    | anondef                                                                       #anondef_
-    | prefixexp                                                                     #prefixexp_
-    | tableconstructor                                                              #tableconstructor_
-    | <assoc=right> exp operatorPower exp                                           #power
-    | operatorUnary exp                                                             #unary
-    | 'length' '(' exp ')'                                                          #lengthBrackets
-    | 'length' exp                                                                  #length
-    | exp operatorMulDivMod exp                                                     #mulDivMod
-    | exp operatorAddSub exp                                                        #addSub
-    | <assoc=right> exp operatorStrcat exp                                          #concat
-    | exp operatorComparison exp                                                    #compare
-    | exp operatorAnd exp                                                           #and
-    | exp operatorOr exp                                                            #or
-    | exp operatorBitwise exp                                                       #bitwise
-    | assignexp                                                                     #assignexp_
+    : 'null'                                                                            #null
+    | 'false'                                                                           #false
+    | 'true'                                                                            #true
+    | number                                                                            #number_
+    | string                                                                            #string_
+    | '...'                                                                             #allArgs
+    | anondef                                                                           #anondef_
+    | prefixexp                                                                         #prefixexp_
+    | tableconstructor                                                                  #tableconstructor_
+    | <assoc=right> exp operatorPower exp                                               #power
+    | operatorUnary exp                                                                 #unary
+    | 'length' '(' exp ')'                                                              #lengthBrackets
+    | 'length' exp                                                                      #length
+    | exp operatorMulDivMod exp                                                         #mulDivMod
+    | exp operatorAddSub exp                                                            #addSub
+    | <assoc=right> exp operatorStrcat exp                                              #concat
+    | exp operatorComparison exp                                                        #compare
+    | exp operatorAnd exp                                                               #and
+    | exp operatorOr exp                                                                #or
+    | exp operatorBitwise exp                                                           #bitwise
+    | assignexp                                                                         #assignexp_
     ;
 
 prefixexp
@@ -191,7 +191,7 @@ args
     ;
 
 anondef
-    : 'lambda' anonlist '{' block '}'
+    : 'lambda' anonlist? '{' block '}'
     ;
 
 anonlist
@@ -236,7 +236,7 @@ operatorAnd
 	: 'and' | '&&';
 
 operatorComparison
-	: '<' | '>' | '<=' | '>=' | '~=' | '==' | 'is';
+	: '<' | '>' | '<=' | '>=' | '!=' | '==' | 'is';
 
 operatorStrcat
 	: '++';

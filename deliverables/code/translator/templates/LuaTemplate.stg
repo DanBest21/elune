@@ -1,7 +1,11 @@
 sep() ::= << ; >>
 break() ::= << break >>
-continue() ::= << goto continue >>
+continue(num) ::= << goto continue_<num> >>
 end() ::= << end >>
+
+label(text) ::= << ::<text>:: >>
+goto(label) ::= << goto <label> >>
+
 print(exp) ::= << print(<exp>) >>
 return(values) ::= << return <values; separator = ", "> >>
 
@@ -16,14 +20,14 @@ anonFuncDef(args) ::= << function (<args; separator = ", ">) >>
 prefixExp(name, args) ::= << <if(name)>:<name><endif><args> >>
 funcCall(args) ::= << (<args; separator = ", ">) >>
 
-loopEnd() ::= <<
-    ::continue::
+loopEnd(num) ::= <<
+    ::continue_<num>::
 end >>
 
 do() ::= << do >>
 doWhile() ::= << repeat >>
-doWhileEnd(cond) ::= <<
-    ::continue::
+doWhileEnd(cond, num) ::= <<
+    ::continue_<num>::
 until not (<cond>) >>
 while(cond) ::= << while <cond> do >>
 
@@ -31,14 +35,29 @@ for(var, start, end, inc) ::= <<
 local <var> = <start>
 while <end> do
     <if(inc)><inc><endif> >>
-forEnd(inc) ::= <<
+forEnd(inc, num) ::= <<
     <inc>
+    ::continue_<num>::
 end >>
 forEach(element, list) ::= << for _, <element> in ipairs(<list>) do >>
 
 if(cond) ::= << if <cond> then >>
 elseIf(cond) ::= << elseif <cond> then >>
 else() ::= << else >>
+
+switch(num, var, cases, def) ::= <<
+_switch_<num> = { <cases; separator = "\n              "> }
+_case_<num> = _switch_<num>[<var>]
+
+if _case_<num> ~= nil then
+    _case_<num>()
+<if(def)>
+else
+    <def>
+<endif>
+end
+>>
+switchCase(case, action) ::= << [<case>] = function()<action> end >>
 
 unaryOperatorExpr(y, symbol) ::= << <symbol> <y> >>
 operatorExpr(x, y, symbol) ::= << <x> <symbol> <y> >>

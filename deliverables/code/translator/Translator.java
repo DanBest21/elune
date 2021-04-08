@@ -41,9 +41,11 @@ public class Translator
         private final StringBuilder translatedCode = new StringBuilder();
         private final List<String> globalScope = new ArrayList<>();
         private Block currentBlock = new Block(null);
+        private int switchCount = 0;
+        private int loopCount = 0;
 
         private boolean insideBlock = false;
-        private boolean innerTranslator;
+        private final boolean innerTranslator;
 
         private final EluneExprTranslator<String> exprTranslator = new EluneExprTranslator<>(this);
 
@@ -85,10 +87,40 @@ public class Translator
         @Override
         public void enterContinue(EluneParser.ContinueContext ctx)
         {
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("num", loopCount);
+
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("continue", null, true));
+                translatedCode.append(Renderer.gen("continue", map, true));
             else
-                translatedCode.append(Renderer.gen("continue", null)).append("\n");
+                translatedCode.append(Renderer.gen("continue", map)).append("\n");
+        }
+
+        @Override
+        public void enterLabel(EluneParser.LabelContext ctx)
+        {
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("text", ctx.NAME().getText());
+
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("label", map, true));
+            else
+                translatedCode.append(Renderer.gen("label", map)).append("\n");
+        }
+
+        @Override
+        public void enterGoto(EluneParser.GotoContext ctx)
+        {
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("label", ctx.NAME().getText());
+
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("goto", map, true));
+            else
+                translatedCode.append(Renderer.gen("goto", map)).append("\n");
         }
 
         @Override
@@ -164,7 +196,7 @@ public class Translator
 
             map.put("values", valueList.toArray());
 
-            String templateName = "";
+            String templateName;
 
             if (isDec)
                 templateName = "varDec";
@@ -336,6 +368,9 @@ public class Translator
         @Override
         public void exitAnondef(EluneParser.AnondefContext ctx)
         {
+            if (insideBlock)
+                return;
+
             toggleInsideBlock();
         }
 
@@ -396,6 +431,7 @@ public class Translator
 
             Map<String, Object> map = new HashMap<>();
 
+            map.put("num", loopCount);
             map.put("cond", exprTranslator.visit(ctx.exp()));
 
             Renderer.decreaseTab();
@@ -405,6 +441,8 @@ public class Translator
                 translatedCode.append(" ").append(Renderer.gen("doWhileEnd", map, true));
             else
                 translatedCode.append(Renderer.gen("doWhileEnd", map)).append("\n\n");
+
+            loopCount++;
         }
 
         @Override
@@ -437,10 +475,15 @@ public class Translator
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
 
+            Map<String, Object> map = new HashMap<>();
+            map.put("num", loopCount);
+
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("loopEnd", null, true));
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true));
             else
-                translatedCode.append(Renderer.gen("loopEnd", null)).append("\n\n");
+                translatedCode.append(Renderer.gen("loopEnd", map)).append("\n\n");
+
+            loopCount++;
         }
 
         @Override
@@ -478,10 +521,16 @@ public class Translator
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
 
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("num", loopCount);
+
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("loopEnd", null, true));
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true));
             else
-                translatedCode.append(Renderer.gen("loopEnd", null)).append("\n\n");
+                translatedCode.append(Renderer.gen("loopEnd", map)).append("\n\n");
+
+            loopCount++;
         }
 
         @Override
@@ -515,10 +564,16 @@ public class Translator
             Renderer.decreaseTab();
             currentBlock = currentBlock.parentBlock;
 
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("num", loopCount);
+
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("loopEnd", null, true));
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true));
             else
-                translatedCode.append(Renderer.gen("loopEnd", null)).append("\n\n");
+                translatedCode.append(Renderer.gen("loopEnd", map)).append("\n\n");
+
+            loopCount++;
         }
 
         @Override
@@ -620,6 +675,86 @@ public class Translator
                 translatedCode.append(" ").append(Renderer.gen("end", null, true));
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n\n");
+        }
+
+        @Override
+        public void enterSwitch(EluneParser.SwitchContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            Map<String, Object> map = new HashMap<>();
+
+            Block newBlock = new Block(currentBlock);
+
+            toggleInsideBlock();
+
+            List<String> switchCases = new ArrayList<>();
+
+            for (int i = 0; i < ctx.exp().size(); i++)
+            {
+                map.put("case", exprTranslator.visit(ctx.exp(i)));
+
+                EluneTranslator translator = new EluneTranslator(true);
+                translator.currentBlock = newBlock;
+
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(translator, ctx.block(i));
+
+                map.put("action", translator.render());
+
+                switchCount += translator.switchCount;
+                loopCount += translator.loopCount;
+
+                switchCases.add(Renderer.gen("switchCase", map) + ",");
+            }
+
+            map.clear();
+
+            map.put("num", switchCount);
+            map.put("var", exprTranslator.visit(ctx.var_()));
+            map.put("cases", switchCases);
+
+            if (ctx.block().size() > ctx.exp().size())
+            {
+                EluneTranslator translator = new EluneTranslator(true);
+                translator.currentBlock = newBlock;
+
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(translator, ctx.block(ctx.exp().size()));
+
+                switchCount += translator.switchCount;
+
+                map.put("def", translator.render());
+            }
+            else
+            {
+                map.put("def", null);
+            }
+
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("switch", map, true));
+            else
+                translatedCode.append(Renderer.gen("switch", map)).append("\n\n");
+        }
+
+        @Override
+        public void exitSwitch(EluneParser.SwitchContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            toggleInsideBlock();
+            switchCount++;
+        }
+
+        @Override
+        public void enterTryCatch(EluneParser.TryCatchContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+
         }
 
         @Override
@@ -744,7 +879,7 @@ public class Translator
         }
     }
 
-    private class Block
+    private static class Block
     {
         private final List<String> blockScope = new ArrayList<>();
         private final Block parentBlock;
@@ -772,7 +907,7 @@ public class Translator
 
     private class EluneExprTranslator<String> extends EluneBaseVisitor<java.lang.String>
     {
-        private EluneTranslator translator;
+        private final EluneTranslator translator;
 
         public EluneExprTranslator(EluneTranslator translator)
         {
@@ -930,6 +1065,9 @@ public class Translator
             ParseTreeWalker walker = new ParseTreeWalker();
             walker.walk(insideTranslator, ctx.block());
 
+            translator.switchCount += insideTranslator.switchCount;
+            translator.loopCount += insideTranslator.loopCount;
+
             return Renderer.gen("anonFuncDef", map, true) + insideTranslator.render() + " " + Renderer.gen("end", null, true);
         }
 
@@ -1051,7 +1189,7 @@ public class Translator
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
-            map.put("symbol", ctx.operatorComparison().getText());
+            map.put("symbol", ctx.operatorComparison().getText().equals("~=") ? "!=" : ctx.operatorComparison().getText());
 
             return Renderer.gen("operatorExpr", map, true);
         }
@@ -1105,7 +1243,7 @@ public class Translator
             else
             {
                 StringBuilder output = new StringBuilder();
-                List<String> lines = Arrays.asList(st.render().trim().split("(?<=" + System.getProperty("line.separator") + ")"));
+                String[] lines = st.render().trim().split("(?<=" + System.getProperty("line.separator") + ")");
 
                 for (String line : lines)
                 {
