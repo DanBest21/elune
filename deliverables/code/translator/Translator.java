@@ -45,6 +45,7 @@ public class Translator
         private int loopCount = 0;
 
         private boolean insideBlock = false;
+        private ParserRuleContext insideTrigger = null;
         private final boolean innerTranslator;
 
         private final EluneExprTranslator<String> exprTranslator = new EluneExprTranslator<>(this);
@@ -79,7 +80,7 @@ public class Translator
         public void enterBreak(EluneParser.BreakContext ctx)
         {
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("break", null, true));
+                translatedCode.append(Renderer.gen("break", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("break", null)).append("\n");
         }
@@ -92,7 +93,7 @@ public class Translator
             map.put("num", loopCount);
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("continue", map, true));
+                translatedCode.append(Renderer.gen("continue", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("continue", map)).append("\n");
         }
@@ -105,7 +106,7 @@ public class Translator
             map.put("text", ctx.NAME().getText());
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("label", map, true));
+                translatedCode.append(Renderer.gen("label", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("label", map)).append("\n");
         }
@@ -118,7 +119,7 @@ public class Translator
             map.put("label", ctx.NAME().getText());
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("goto", map, true));
+                translatedCode.append(Renderer.gen("goto", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("goto", map)).append("\n");
         }
@@ -152,7 +153,7 @@ public class Translator
             map.put("values", valueList.toArray());
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("globalVar", map, true));
+                translatedCode.append(" ").append(Renderer.gen("globalVar", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("globalVar", map)).append("\n");
 
@@ -204,7 +205,7 @@ public class Translator
                 templateName = "varAssign";
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen(templateName, map, true));
+                translatedCode.append(" ").append(Renderer.gen(templateName, map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen(templateName, map)).append("\n");
         }
@@ -256,7 +257,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n");
         }
@@ -308,7 +309,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n");
         }
@@ -360,7 +361,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n");
         }
@@ -368,10 +369,11 @@ public class Translator
         @Override
         public void exitAnondef(EluneParser.AnondefContext ctx)
         {
-            if (insideBlock)
-                return;
-
-            toggleInsideBlock();
+            if (insideTrigger.equals(ctx))
+            {
+                toggleInsideBlock();
+                insideTrigger = null;
+            }
         }
 
         @Override
@@ -401,7 +403,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n\n");
         }
@@ -438,7 +440,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("doWhileEnd", map, true));
+                translatedCode.append(" ").append(Renderer.gen("doWhileEnd", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("doWhileEnd", map)).append("\n\n");
 
@@ -479,7 +481,7 @@ public class Translator
             map.put("num", loopCount);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true));
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("loopEnd", map)).append("\n\n");
 
@@ -526,7 +528,7 @@ public class Translator
             map.put("num", loopCount);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true));
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("loopEnd", map)).append("\n\n");
 
@@ -569,7 +571,7 @@ public class Translator
             map.put("num", loopCount);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true));
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("loopEnd", map)).append("\n\n");
 
@@ -672,7 +674,7 @@ public class Translator
                 return;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true));
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n\n");
         }
@@ -688,6 +690,7 @@ public class Translator
             Block newBlock = new Block(currentBlock);
 
             toggleInsideBlock();
+            insideTrigger = ctx;
 
             List<String> switchCases = new ArrayList<>();
 
@@ -733,7 +736,7 @@ public class Translator
             }
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("switch", map, true));
+                translatedCode.append(Renderer.gen("switch", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("switch", map)).append("\n\n");
         }
@@ -741,20 +744,170 @@ public class Translator
         @Override
         public void exitSwitch(EluneParser.SwitchContext ctx)
         {
-            if (insideBlock)
-                return;
-
-            toggleInsideBlock();
-            switchCount++;
+            if (insideTrigger.equals(ctx))
+            {
+                toggleInsideBlock();
+                insideTrigger = null;
+                switchCount++;
+            }
         }
 
         @Override
-        public void enterTryCatch(EluneParser.TryCatchContext ctx)
+        public void enterTryStmt(EluneParser.TryStmtContext ctx)
         {
             if (insideBlock)
                 return;
 
+            Map<String, Object> map = new HashMap<>();
 
+            Block newBlock = new Block(currentBlock);
+
+            toggleInsideBlock();
+            insideTrigger = ctx;
+
+            EluneTranslator translator = new EluneTranslator(true);
+            translator.currentBlock = newBlock;
+
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.walk(translator, ctx.block());
+
+            map.put("block", translator.render());
+
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("try", map, true));
+            else
+                translatedCode.append(Renderer.gen("try", map)).append("\n");
+        }
+
+        @Override
+        public void exitTryStmt(EluneParser.TryStmtContext ctx)
+        {
+            if (insideTrigger.equals(ctx))
+            {
+                toggleInsideBlock();
+                insideTrigger = null;
+            }
+        }
+
+        @Override
+        public void enterCatchStmt(EluneParser.CatchStmtContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            Block newBlock = new Block(currentBlock);
+
+            toggleInsideBlock();
+            insideTrigger = ctx;
+
+            Renderer.increaseTab();
+
+            for (int i = 0; i < ctx.block().size(); i++)
+            {
+                Map<String, Object> map = new HashMap<>();
+
+                map.put("exception", ctx.NAME(i).getText());
+
+                EluneTranslator translator = new EluneTranslator(true);
+                translator.currentBlock = newBlock;
+
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(translator, ctx.block(i));
+
+                map.put("action", translator.render());
+
+                if (innerTranslator)
+                    translatedCode.append(Renderer.gen("catch", map, true));
+                else
+                    translatedCode.append(Renderer.gen("catch", map)).append("\n");
+            }
+
+            Renderer.decreaseTab();
+        }
+
+        @Override
+        public void exitCatchStmt(EluneParser.CatchStmtContext ctx)
+        {
+            if (insideTrigger.equals(ctx))
+            {
+                toggleInsideBlock();
+                insideTrigger = null;
+            }
+        }
+
+        @Override
+        public void enterFinallyStmt(EluneParser.FinallyStmtContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            Block newBlock = new Block(currentBlock);
+
+            Map<String, Object> map = new HashMap<>();
+
+            toggleInsideBlock();
+            insideTrigger = ctx;
+
+            EluneTranslator translator = new EluneTranslator(true);
+            translator.currentBlock = newBlock;
+
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.walk(translator, ctx.block());
+
+            map.put("block", translator.render());
+
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("end", null, true)).append("\n").append(Renderer.gen("finally", map, true)).append(";");
+            else
+                translatedCode.append(Renderer.gen("end", null)).append("\n").append(Renderer.gen("finally", map)).append("\n");
+        }
+
+        @Override
+        public void exitFinallyStmt(EluneParser.FinallyStmtContext ctx)
+        {
+            if (insideTrigger.equals(ctx))
+            {
+                toggleInsideBlock();
+                insideTrigger = null;
+            }
+        }
+
+        @Override
+        public void exitTryCatch(EluneParser.TryCatchContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            if (innerTranslator)
+            {
+                if (ctx.finallyStmt() == null)
+                    translatedCode.append(Renderer.gen("end", null, true)).append(";");
+                else
+                    translatedCode.append(";");
+            }
+            else
+            {
+                if (ctx.finallyStmt() == null)
+                    translatedCode.append(Renderer.gen("end", null, true)).append("\n\n");
+                else
+                    translatedCode.append("\n\n");
+            }
+        }
+
+        @Override
+        public void enterException(EluneParser.ExceptionContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("return", ctx.NAME().getText());
+
+            if (innerTranslator)
+                translatedCode.append(Renderer.gen("exception", map, true)).append(";");
+            else
+                translatedCode.append(Renderer.gen("exception", map)).append("\n");
         }
 
         @Override
@@ -788,7 +941,7 @@ public class Translator
             }
 
             if (innerTranslator)
-                translatedCode.append(" ").append(functionCall);
+                translatedCode.append(" ").append(functionCall).append(";");
             else
                 translatedCode.append(functionCall).append("\n");
         }
@@ -800,7 +953,7 @@ public class Translator
                 return;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(exprTranslator.visit(ctx));
+                translatedCode.append(" ").append(exprTranslator.visit(ctx)).append(";");
             else
                 translatedCode.append(Renderer.getTab()).append(exprTranslator.visit(ctx)).append("\n");
         }
@@ -816,7 +969,7 @@ public class Translator
             map.put("exp", exprTranslator.visit(ctx.exp()));
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("print", map, true));
+                translatedCode.append(" ").append(Renderer.gen("print", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("print", map)).append("\n");
         }
@@ -832,7 +985,7 @@ public class Translator
             map.put("exp", exprTranslator.visit(ctx.exp()));
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("print", map, true));
+                translatedCode.append(" ").append(Renderer.gen("print", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("print", map)).append("\n");
         }
@@ -858,7 +1011,7 @@ public class Translator
             map.put("values", values);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("return", map, true));
+                translatedCode.append(" ").append(Renderer.gen("return", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("return", map)).append("\n");
         }
@@ -1061,6 +1214,7 @@ public class Translator
 
             insideTranslator.setCurrentBlock(newBlock);
             translator.toggleInsideBlock();
+            translator.insideTrigger = ctx;
 
             ParseTreeWalker walker = new ParseTreeWalker();
             walker.walk(insideTranslator, ctx.block());
@@ -1189,7 +1343,8 @@ public class Translator
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
-            map.put("symbol", ctx.operatorComparison().getText().equals("~=") ? "!=" : ctx.operatorComparison().getText());
+            map.put("symbol", ctx.operatorComparison().getText().equals("!=") ? "~=" :
+                    (ctx.operatorComparison().getText().equals("is") ? "==" : ctx.operatorComparison().getText()));
 
             return Renderer.gen("operatorExpr", map, true);
         }

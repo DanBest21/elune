@@ -59,6 +59,18 @@ end
 >>
 switchCase(case, action) ::= << [<case>] = function()<action> end >>
 
+try(block) ::= <<
+local status, err = pcall(function() <block> end)
+if not status then
+>>
+catch(exception, action) ::= <<
+if err.code == "<exception>" then
+    <action>
+end
+>>
+finally(block) ::= << <block> >>
+exception(return) ::= << error({code = "<return>"}) >>
+
 unaryOperatorExpr(y, symbol) ::= << <symbol> <y> >>
 operatorExpr(x, y, symbol) ::= << <x> <symbol> <y> >>
 compoundAssign(x, y, symbol) ::= << <x> = <x> <symbol> <y> >>

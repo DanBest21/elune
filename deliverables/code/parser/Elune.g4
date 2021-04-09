@@ -69,7 +69,8 @@ stat
     | 'def' funcname funcbody                                                           #objFunc
     | attnamelist ('=' explist)?                                                        #att
     | 'switch' var_ '{' ('case' exp '{' block '}')+ ('default' '{' block '}')? '}'      #switch
-    | 'try' '{' block '}' ('catch' exp '{' block '}')+ ('finally' exp '{' block '}')?   #tryCatch
+    | tryStmt catchStmt finallyStmt?                                                    #tryCatch
+    | 'throw' NAME                                                                      #exception
     | assignexp                                                                         #assign
     | 'print' '(' exp ')'                                                               #printBrackets
     | 'print' exp                                                                       #print
@@ -134,6 +135,18 @@ elseIfStmt
 
 elseStmt
     : 'else' '{' block '}'
+    ;
+
+tryStmt
+    : 'try' '{' block '}'
+    ;
+
+catchStmt
+    : ('catch' NAME '{' block '}')+
+    ;
+
+finallyStmt
+    : 'finally' '{' block '}'
     ;
 
 exp
