@@ -1016,6 +1016,24 @@ public class Translator
                 translatedCode.append(Renderer.gen("return", map)).append("\n");
         }
 
+        @Override
+        public void enterImportModule(EluneParser.ImportModuleContext ctx)
+        {
+            if (insideBlock)
+                return;
+
+            generateFile("./source/lib/" + ctx.NAME().getText().toLowerCase(Locale.ROOT) + ".elu");
+
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("name", ctx.NAME().getText().toLowerCase(Locale.ROOT));
+
+            if (innerTranslator)
+                translatedCode.append(" ").append(Renderer.gen("importModule", map, true)).append(";");
+            else
+                translatedCode.append(Renderer.gen("importModule", map)).append("\n");
+        }
+
         public List<String> getScope()
         {
             List<String> scope = new ArrayList<>(globalScope);
@@ -1097,7 +1115,66 @@ public class Translator
         @Override
         public java.lang.String visitVar_(EluneParser.Var_Context ctx)
         {
-            return ctx.getText();
+            StringBuilder var = new StringBuilder();
+
+            if (ctx.NAME() != null)
+            {
+                var.append(ctx.NAME().getText());
+            }
+            if (ctx.exp() != null)
+            {
+                 var.append(this.visit(ctx.exp()));
+            }
+            if (ctx.varSuffix().size() > 0)
+            {
+                for (int i = 0; i < ctx.varSuffix().size(); i++)
+                {
+                    var.append(this.visit(ctx.varSuffix(i)));
+                }
+            }
+
+            return var.toString();
+        }
+
+        @Override
+        public java.lang.String visitVarSuffix(EluneParser.VarSuffixContext ctx)
+        {
+            StringBuilder varSuffix = new StringBuilder();
+
+            if (ctx.nameAndArgs().size() > 0)
+            {
+                for (int i = 0; i < ctx.nameAndArgs().size(); i++)
+                {
+                    varSuffix.append(this.visit(ctx.nameAndArgs(i)));
+                }
+            }
+            if (ctx.exp() != null)
+            {
+                varSuffix.append("[").append(this.visit(ctx.exp())).append("]");
+            }
+            if (ctx.NAME() != null)
+            {
+                varSuffix.append(".").append(ctx.NAME().getText());
+            }
+
+            return varSuffix.toString();
+        }
+
+        @Override
+        public java.lang.String visitNameAndArgs(EluneParser.NameAndArgsContext ctx)
+        {
+            StringBuilder nameAndArgs = new StringBuilder();
+
+            if (ctx.NAME() != null)
+            {
+                nameAndArgs.append(":").append(ctx.NAME().getText());
+            }
+            if (ctx.args() != null)
+            {
+                nameAndArgs.append(this.visit(ctx.args()));
+            }
+
+            return nameAndArgs.toString();
         }
 
         @Override
@@ -1424,7 +1501,12 @@ public class Translator
 
     public static void main(String[] args)
     {
-        Path path = new File("./source/test_1.elu").toPath();
+        generateFile(args[0]);
+    }
+
+    public static void generateFile(String pathname)
+    {
+        Path path = new File(pathname).toPath();
 
         Translator translator = new Translator();
 

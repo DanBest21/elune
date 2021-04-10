@@ -8,6 +8,7 @@ goto(label) ::= << goto <label> >>
 
 print(exp) ::= << print(<exp>) >>
 return(values) ::= << return <values; separator = ", "> >>
+importModule(name) ::= << require "<name>" >>
 
 globalVar(names, values) ::= << <names; separator = ", "> = <values; separator = ", "> >>
 varDec(names, values) ::= << local <names; separator = ", "> = <values; separator = ", "> >>

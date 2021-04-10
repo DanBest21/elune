@@ -42,7 +42,7 @@ Tested by Alexander Alexeev with Test suite for Lua 5.3 http://www.lua.org/tests
 grammar Elune;
 
 root
-    : importdef? block EOF
+    : importdef* block EOF
     ;
 
 block
@@ -77,11 +77,8 @@ stat
     ;
 
 importdef
-    : ('import' libname)+
-    ;
-
-libname
-    : NAME ('.' NAME)*
+    : 'import' NAME                                                                     #importModule
+//  | 'from' NAME 'import' NAME (',' NAME)*                                             #importFuncs
     ;
 
 assignexp
