@@ -2,9 +2,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.stringtemplate.v4.*;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -12,7 +10,7 @@ import org.apache.commons.io.FilenameUtils;
 
 public class Translator
 {
-    public String translate(Path path)
+    public String translate(Path path, boolean importStdLibrary)
     {
         CharStream input = null;
 
@@ -20,16 +18,17 @@ public class Translator
         {
             input = CharStreams.fromPath(path);
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
             ex.printStackTrace();
         }
 
         EluneLexer lexer = new EluneLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
+
         EluneParser parser = new EluneParser(tokens);
 
-        EluneTranslator translator = new EluneTranslator(false);
+        EluneTranslator translator = new EluneTranslator(false, importStdLibrary);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(translator, parser.root());
 
@@ -44,15 +43,22 @@ public class Translator
         private int switchCount = 0;
         private int loopCount = 0;
 
-        private boolean insideBlock = false;
-        private ParserRuleContext insideTrigger = null;
+        private final List<ParserRuleContext> insideTriggers = new ArrayList<>();
         private final boolean innerTranslator;
+        private final boolean importStdLibrary;
 
-        private final EluneExprTranslator<String> exprTranslator = new EluneExprTranslator<>(this);
+        private final EluneExprTranslator exprTranslator = new EluneExprTranslator(this);
 
         public EluneTranslator(boolean innerTranslator)
         {
             this.innerTranslator = innerTranslator;
+            this.importStdLibrary = false;
+        }
+
+        public EluneTranslator(boolean innerTranslator, boolean importStdLibrary)
+        {
+            this.innerTranslator = innerTranslator;
+            this.importStdLibrary = importStdLibrary;
         }
 
         public Block getCurrentBlock()
@@ -65,7 +71,23 @@ public class Translator
             currentBlock = newBlock;
         }
 
-        public void toggleInsideBlock() { insideBlock = !insideBlock; }
+        @Override
+        public void enterRoot(EluneParser.RootContext ctx)
+        {
+            if (importStdLibrary)
+            {
+                generateFile("./source/lib/std.elu");
+
+                Map<String, Object> map = new HashMap<>();
+
+                map.put("name", "std");
+
+                if (innerTranslator)
+                    translatedCode.append(" ").append(Renderer.gen("importModule", map, true)).append(";");
+                else
+                    translatedCode.append(Renderer.gen("importModule", map)).append("\n");
+            }
+        }
 
         @Override
         public void enterSep(EluneParser.SepContext ctx)
@@ -127,7 +149,7 @@ public class Translator
         @Override
         public void enterGlobalVar(EluneParser.GlobalVarContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -163,7 +185,7 @@ public class Translator
         @Override
         public void enterVar(EluneParser.VarContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -213,7 +235,7 @@ public class Translator
         @Override
         public void enterGlobalFunc(EluneParser.GlobalFuncContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -250,7 +272,7 @@ public class Translator
         @Override
         public void exitGlobalFunc(EluneParser.GlobalFuncContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -265,7 +287,7 @@ public class Translator
         @Override
         public void enterFunc(EluneParser.FuncContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -302,7 +324,7 @@ public class Translator
         @Override
         public void exitFunc(EluneParser.FuncContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -317,7 +339,7 @@ public class Translator
         @Override
         public void enterObjFunc(EluneParser.ObjFuncContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -354,7 +376,7 @@ public class Translator
         @Override
         public void exitObjFunc(EluneParser.ObjFuncContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -369,17 +391,13 @@ public class Translator
         @Override
         public void exitAnondef(EluneParser.AnondefContext ctx)
         {
-            if (insideTrigger.equals(ctx))
-            {
-                toggleInsideBlock();
-                insideTrigger = null;
-            }
+            insideTriggers.remove(ctx);
         }
 
         @Override
         public void enterDo(EluneParser.DoContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Block newBlock = new Block(currentBlock);
@@ -396,7 +414,7 @@ public class Translator
         @Override
         public void exitDo(EluneParser.DoContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -411,7 +429,7 @@ public class Translator
         @Override
         public void enterDoWhile(EluneParser.DoWhileContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Block newBlock = new Block(currentBlock);
@@ -428,7 +446,7 @@ public class Translator
         @Override
         public void exitDoWhile(EluneParser.DoWhileContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -450,7 +468,7 @@ public class Translator
         @Override
         public void enterWhile(EluneParser.WhileContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -471,7 +489,7 @@ public class Translator
         @Override
         public void exitWhile(EluneParser.WhileContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -491,7 +509,7 @@ public class Translator
         @Override
         public void enterFor(EluneParser.ForContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -517,7 +535,7 @@ public class Translator
         @Override
         public void exitFor(EluneParser.ForContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -538,7 +556,7 @@ public class Translator
         @Override
         public void enterForeach(EluneParser.ForeachContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -560,7 +578,7 @@ public class Translator
         @Override
         public void exitForeach(EluneParser.ForeachContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -581,7 +599,7 @@ public class Translator
         @Override
         public void enterIfStmt(EluneParser.IfStmtContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -602,7 +620,7 @@ public class Translator
         @Override
         public void exitIfStmt(EluneParser.IfStmtContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -612,7 +630,7 @@ public class Translator
         @Override
         public void enterElseIfStmt(EluneParser.ElseIfStmtContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -633,7 +651,7 @@ public class Translator
         @Override
         public void exitElseIfStmt(EluneParser.ElseIfStmtContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -643,7 +661,7 @@ public class Translator
         @Override
         public void enterElseStmt(EluneParser.ElseStmtContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Block newBlock = new Block(currentBlock);
@@ -660,7 +678,7 @@ public class Translator
         @Override
         public void exitElseStmt(EluneParser.ElseStmtContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Renderer.decreaseTab();
@@ -670,7 +688,7 @@ public class Translator
         @Override
         public void exitIfElse(EluneParser.IfElseContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             if (innerTranslator)
@@ -682,15 +700,14 @@ public class Translator
         @Override
         public void enterSwitch(EluneParser.SwitchContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
 
             Block newBlock = new Block(currentBlock);
 
-            toggleInsideBlock();
-            insideTrigger = ctx;
+            insideTriggers.add(ctx);
 
             List<String> switchCases = new ArrayList<>();
 
@@ -744,26 +761,21 @@ public class Translator
         @Override
         public void exitSwitch(EluneParser.SwitchContext ctx)
         {
-            if (insideTrigger.equals(ctx))
-            {
-                toggleInsideBlock();
-                insideTrigger = null;
+            if (insideTriggers.remove(ctx))
                 switchCount++;
-            }
         }
 
         @Override
         public void enterTryStmt(EluneParser.TryStmtContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
 
             Block newBlock = new Block(currentBlock);
 
-            toggleInsideBlock();
-            insideTrigger = ctx;
+            insideTriggers.add(ctx);
 
             EluneTranslator translator = new EluneTranslator(true);
             translator.currentBlock = newBlock;
@@ -782,23 +794,18 @@ public class Translator
         @Override
         public void exitTryStmt(EluneParser.TryStmtContext ctx)
         {
-            if (insideTrigger.equals(ctx))
-            {
-                toggleInsideBlock();
-                insideTrigger = null;
-            }
+            insideTriggers.remove(ctx);
         }
 
         @Override
         public void enterCatchStmt(EluneParser.CatchStmtContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Block newBlock = new Block(currentBlock);
 
-            toggleInsideBlock();
-            insideTrigger = ctx;
+            insideTriggers.add(ctx);
 
             Renderer.increaseTab();
 
@@ -828,25 +835,20 @@ public class Translator
         @Override
         public void exitCatchStmt(EluneParser.CatchStmtContext ctx)
         {
-            if (insideTrigger.equals(ctx))
-            {
-                toggleInsideBlock();
-                insideTrigger = null;
-            }
+            insideTriggers.remove(ctx);
         }
 
         @Override
         public void enterFinallyStmt(EluneParser.FinallyStmtContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Block newBlock = new Block(currentBlock);
 
             Map<String, Object> map = new HashMap<>();
 
-            toggleInsideBlock();
-            insideTrigger = ctx;
+            insideTriggers.add(ctx);
 
             EluneTranslator translator = new EluneTranslator(true);
             translator.currentBlock = newBlock;
@@ -865,17 +867,13 @@ public class Translator
         @Override
         public void exitFinallyStmt(EluneParser.FinallyStmtContext ctx)
         {
-            if (insideTrigger.equals(ctx))
-            {
-                toggleInsideBlock();
-                insideTrigger = null;
-            }
+            insideTriggers.remove(ctx);
         }
 
         @Override
         public void exitTryCatch(EluneParser.TryCatchContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             if (innerTranslator)
@@ -897,7 +895,7 @@ public class Translator
         @Override
         public void enterException(EluneParser.ExceptionContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -913,7 +911,7 @@ public class Translator
         @Override
         public void enterFunctioncall(EluneParser.FunctioncallContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             StringBuilder functionCall = new StringBuilder();
@@ -921,8 +919,8 @@ public class Translator
 
             for (int i = 0; i < ctx.nameAndArgs().size(); i++)
             {
-                Map<java.lang.String, Object> map = new HashMap<>();
-                List<java.lang.String> args = new ArrayList<>();
+                Map<String, Object> map = new HashMap<>();
+                List<String> args = new ArrayList<>();
 
                 if (ctx.nameAndArgs(i).NAME() != null)
                     map.put("name", ":" + exprTranslator.visit(ctx.nameAndArgs(i).NAME()));
@@ -949,7 +947,7 @@ public class Translator
         @Override
         public void enterAssign(EluneParser.AssignContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             if (innerTranslator)
@@ -961,7 +959,7 @@ public class Translator
         @Override
         public void enterPrint(EluneParser.PrintContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -977,7 +975,7 @@ public class Translator
         @Override
         public void enterPrintBrackets(EluneParser.PrintBracketsContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -993,7 +991,7 @@ public class Translator
         @Override
         public void enterRetstat(EluneParser.RetstatContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             Map<String, Object> map = new HashMap<>();
@@ -1019,7 +1017,7 @@ public class Translator
         @Override
         public void enterImportModule(EluneParser.ImportModuleContext ctx)
         {
-            if (insideBlock)
+            if (!insideTriggers.isEmpty())
                 return;
 
             generateFile("./source/lib/" + ctx.NAME().getText().toLowerCase(Locale.ROOT) + ".elu");
@@ -1076,7 +1074,7 @@ public class Translator
         }
     }
 
-    private class EluneExprTranslator<String> extends EluneBaseVisitor<java.lang.String>
+    private class EluneExprTranslator extends EluneBaseVisitor<String>
     {
         private final EluneTranslator translator;
 
@@ -1086,34 +1084,34 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitName(EluneParser.NameContext ctx)
+        public String visitName(EluneParser.NameContext ctx)
         {
             return ctx.NAME().getText();
         }
 
         @Override
-        public java.lang.String visitNumber(EluneParser.NumberContext ctx)
+        public String visitNumber(EluneParser.NumberContext ctx)
         {
             return ctx.getText();
         }
 
         @Override
-        public java.lang.String visitString(EluneParser.StringContext ctx)
+        public String visitString(EluneParser.StringContext ctx)
         {
             return ctx.getText();
         }
 
         @Override
-        public java.lang.String visitTrue(EluneParser.TrueContext ctx) { return "true"; }
+        public String visitTrue(EluneParser.TrueContext ctx) { return "true"; }
 
         @Override
-        public java.lang.String visitFalse(EluneParser.FalseContext ctx) { return "false"; }
+        public String visitFalse(EluneParser.FalseContext ctx) { return "false"; }
 
         @Override
-        public java.lang.String visitNull(EluneParser.NullContext ctx) { return "nil"; }
+        public String visitNull(EluneParser.NullContext ctx) { return "nil"; }
 
         @Override
-        public java.lang.String visitVar_(EluneParser.Var_Context ctx)
+        public String visitVar_(EluneParser.Var_Context ctx)
         {
             StringBuilder var = new StringBuilder();
 
@@ -1137,7 +1135,7 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitVarSuffix(EluneParser.VarSuffixContext ctx)
+        public String visitVarSuffix(EluneParser.VarSuffixContext ctx)
         {
             StringBuilder varSuffix = new StringBuilder();
 
@@ -1161,7 +1159,7 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitNameAndArgs(EluneParser.NameAndArgsContext ctx)
+        public String visitNameAndArgs(EluneParser.NameAndArgsContext ctx)
         {
             StringBuilder nameAndArgs = new StringBuilder();
 
@@ -1178,7 +1176,7 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitTableconstructor(EluneParser.TableconstructorContext ctx)
+        public String visitTableconstructor(EluneParser.TableconstructorContext ctx)
         {
             if (ctx.fieldlist() != null)
                 return "{" + this.visit(ctx.fieldlist()) + "}";
@@ -1187,7 +1185,7 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitFieldlist(EluneParser.FieldlistContext ctx)
+        public String visitFieldlist(EluneParser.FieldlistContext ctx)
         {
             StringBuilder fieldList = new StringBuilder();
 
@@ -1200,33 +1198,33 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitExprField(EluneParser.ExprFieldContext ctx)
+        public String visitExprField(EluneParser.ExprFieldContext ctx)
         {
             return "[" + this.visit(ctx.exp(0)) + "] = " + this.visit(ctx.exp(1));
         }
 
         @Override
-        public java.lang.String visitVarField(EluneParser.VarFieldContext ctx)
+        public String visitVarField(EluneParser.VarFieldContext ctx)
         {
             return ctx.NAME().getText() + " = " + this.visit(ctx.exp());
         }
 
         @Override
-        public java.lang.String visitIndexedField(EluneParser.IndexedFieldContext ctx)
+        public String visitIndexedField(EluneParser.IndexedFieldContext ctx)
         {
             return this.visit(ctx.exp());
         }
 
         @Override
-        public java.lang.String visitFieldsep(EluneParser.FieldsepContext ctx)
+        public String visitFieldsep(EluneParser.FieldsepContext ctx)
         {
             return ctx.getText() + " ";
         }
 
         @Override
-        public java.lang.String visitLength(EluneParser.LengthContext ctx)
+        public String visitLength(EluneParser.LengthContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("var", this.visit(ctx.exp()));
 
@@ -1234,9 +1232,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitLengthBrackets(EluneParser.LengthBracketsContext ctx)
+        public String visitLengthBrackets(EluneParser.LengthBracketsContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("var", this.visit(ctx.exp()));
 
@@ -1244,15 +1242,15 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitPrefixexp(EluneParser.PrefixexpContext ctx)
+        public String visitPrefixexp(EluneParser.PrefixexpContext ctx)
         {
             StringBuilder functionCall = new StringBuilder();
             functionCall.append(this.visit(ctx.varOrExp()));
 
             for (int i = 0; i < ctx.nameAndArgs().size(); i++)
             {
-                Map<java.lang.String, Object> map = new HashMap<>();
-                List<java.lang.String> args = new ArrayList<>();
+                Map<String, Object> map = new HashMap<>();
+                List<String> args = new ArrayList<>();
 
                 if (ctx.nameAndArgs(i).NAME() != null)
                     map.put("name", ":" + this.visit(ctx.nameAndArgs(i).NAME()));
@@ -1271,18 +1269,18 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitAnondef(EluneParser.AnondefContext ctx)
+        public String visitAnondef(EluneParser.AnondefContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             EluneTranslator insideTranslator = new EluneTranslator(true);
             Block newBlock = new Block(translator.getCurrentBlock());
 
-            List<java.lang.String> args = new ArrayList<>();
+            List<String> args = new ArrayList<>();
 
             for (int i = 0; i < ctx.anonlist().NAME().size(); i++)
             {
-                java.lang.String arg = ctx.anonlist().NAME(i).getText();
+                String arg = ctx.anonlist().NAME(i).getText();
                 args.add(arg);
                 newBlock.putVarInScope(arg);
             }
@@ -1290,8 +1288,7 @@ public class Translator
             map.put("args", args);
 
             insideTranslator.setCurrentBlock(newBlock);
-            translator.toggleInsideBlock();
-            translator.insideTrigger = ctx;
+            translator.insideTriggers.add(ctx);
 
             ParseTreeWalker walker = new ParseTreeWalker();
             walker.walk(insideTranslator, ctx.block());
@@ -1303,10 +1300,10 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitExprArgs(EluneParser.ExprArgsContext ctx)
+        public String visitExprArgs(EluneParser.ExprArgsContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
-            List<java.lang.String> args = new ArrayList<>();
+            Map<String, Object> map = new HashMap<>();
+            List<String> args = new ArrayList<>();
 
             for (int i = 0; i < ctx.explist().getChildCount(); i++)
             {
@@ -1319,9 +1316,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitConcat(EluneParser.ConcatContext ctx)
+        public String visitConcat(EluneParser.ConcatContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
@@ -1331,9 +1328,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitAnd(EluneParser.AndContext ctx)
+        public String visitAnd(EluneParser.AndContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
@@ -1343,9 +1340,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitOr(EluneParser.OrContext ctx)
+        public String visitOr(EluneParser.OrContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
@@ -1355,9 +1352,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitBitwise(EluneParser.BitwiseContext ctx)
+        public String visitBitwise(EluneParser.BitwiseContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
@@ -1367,9 +1364,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitAddSub(EluneParser.AddSubContext ctx)
+        public String visitAddSub(EluneParser.AddSubContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
@@ -1379,9 +1376,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitMulDivMod(EluneParser.MulDivModContext ctx)
+        public String visitMulDivMod(EluneParser.MulDivModContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
@@ -1391,9 +1388,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitUnary(EluneParser.UnaryContext ctx)
+        public String visitUnary(EluneParser.UnaryContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("y", this.visit(ctx.exp()));
             map.put("symbol", ctx.operatorUnary().getText());
@@ -1402,9 +1399,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitPower(EluneParser.PowerContext ctx)
+        public String visitPower(EluneParser.PowerContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
@@ -1414,9 +1411,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitCompare(EluneParser.CompareContext ctx)
+        public String visitCompare(EluneParser.CompareContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("x", this.visit(ctx.exp(0)));
             map.put("y", this.visit(ctx.exp(1)));
@@ -1427,9 +1424,9 @@ public class Translator
         }
 
         @Override
-        public java.lang.String visitAssignexp(EluneParser.AssignexpContext ctx)
+        public String visitAssignexp(EluneParser.AssignexpContext ctx)
         {
-            Map<java.lang.String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
             map.put("x", this.visit(ctx.var_()));
             map.put("y", this.visit(ctx.exp()));
@@ -1499,12 +1496,11 @@ public class Translator
         }
     }
 
-    public static void main(String[] args)
-    {
-        generateFile(args[0]);
-    }
+    public static void main(String[] args) { generateFile(args[0], true); }
 
-    public static void generateFile(String pathname)
+    public static void generateFile(String pathname) { generateFile(pathname, false); }
+
+    public static void generateFile(String pathname, boolean importStd)
     {
         Path path = new File(pathname).toPath();
 
@@ -1521,7 +1517,7 @@ public class Translator
             outputFile.createNewFile();
 
             FileWriter writer = new FileWriter(outputFile.getAbsolutePath());
-            writer.write(translator.translate(path));
+            writer.write(translator.translate(path, importStd));
             writer.close();
         }
         catch (IOException ex)
