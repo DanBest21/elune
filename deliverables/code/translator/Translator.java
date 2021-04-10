@@ -10,6 +10,8 @@ import org.apache.commons.io.FilenameUtils;
 
 public class Translator
 {
+    private static String targetLanguage;
+
     public String translate(Path path, boolean importStdLibrary)
     {
         CharStream input = null;
@@ -1111,6 +1113,12 @@ public class Translator
         public String visitNull(EluneParser.NullContext ctx) { return "nil"; }
 
         @Override
+        public String visitBracketsExp(EluneParser.BracketsExpContext ctx)
+        {
+            return "(" + this.visit(ctx.exp()) + ")";
+        }
+
+        @Override
         public String visitVar_(EluneParser.Var_Context ctx)
         {
             StringBuilder var = new StringBuilder();
@@ -1121,7 +1129,7 @@ public class Translator
             }
             if (ctx.exp() != null)
             {
-                 var.append(this.visit(ctx.exp()));
+                 var.append("(").append(this.visit(ctx.exp())).append(")");
             }
             if (ctx.varSuffix().size() > 0)
             {
@@ -1438,7 +1446,10 @@ public class Translator
 
     private static class Renderer
     {
-        private static final STGroup stf = new STGroupFile("templates/LuaTemplate.stg");
+        private static final STGroup stf = new STGroupFile("templates/"
+                + targetLanguage.substring(0, 1).toUpperCase(Locale.ROOT)
+                + targetLanguage.substring(1, targetLanguage.length()).toLowerCase(Locale.ROOT)
+                + "Template.stg");
         private static int tabLevel = 0;
 
         public static String gen(String name, Map<String, Object> varMap)
@@ -1496,7 +1507,11 @@ public class Translator
         }
     }
 
-    public static void main(String[] args) { generateFile(args[0], true); }
+    public static void main(String[] args)
+    {
+        targetLanguage = args[1];
+        generateFile(args[0], true);
+    }
 
     public static void generateFile(String pathname) { generateFile(pathname, false); }
 
@@ -1508,7 +1523,7 @@ public class Translator
 
         try
         {
-            File outputFile = new File("./source/gen/" + FilenameUtils.removeExtension(path.getFileName().toString()) + ".lua");
+            File outputFile = new File("./source/gen/" + FilenameUtils.removeExtension(path.getFileName().toString()) + "." + targetLanguage.toLowerCase(Locale.ROOT));
 
             if (outputFile.exists())
                 outputFile.delete();

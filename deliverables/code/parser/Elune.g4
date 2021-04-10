@@ -179,7 +179,8 @@ functioncall
     ;
 
 varOrExp
-    : var_ | '(' exp ')'
+    : var_                                                                              #var__
+    | '(' exp ')'                                                                       #bracketsExp
     ;
 
 var_
