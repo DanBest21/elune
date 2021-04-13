@@ -8,7 +8,7 @@ goto(label) ::= << goto <label> >>
 
 print(exp) ::= << print(<exp>) >>
 return(values) ::= << return <values; separator = ", "> >>
-importModule(name) ::= << require "<name>" >>
+importModule(name, assign) ::= << <if(assign)>local <name> = <endif>require "<name>" >>
 
 globalVar(names, values) ::= << <names; separator = ", "> = <values; separator = ", "> >>
 varDec(names, values) ::= << local <names; separator = ", "> = <values; separator = ", "> >>
@@ -19,7 +19,7 @@ funcDef(name, args) ::= << local function <name>(<args; separator = ", ">) >>
 anonFuncDef(args) ::= << function (<args; separator = ", ">) >>
 
 prefixExp(name, args) ::= << <if(name)>:<name><endif><args> >>
-funcCall(args) ::= << (<args; separator = ", ">) >>
+funcCall(name, args) ::= << <name>(<args; separator = ", ">) >>
 
 loopEnd(num) ::= <<
     ::continue_<num>::

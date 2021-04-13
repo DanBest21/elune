@@ -1,0 +1,20 @@
+import game
+
+// Custom types
+game.type = append("TEXTURE", game.type)
+
+/*
+achievements = [
+	C_AchievementInfo.GetRewardItemID = game.new(C_AchievementInfo.GetRewardItemID, [ achievementID = game.type[int] ], [ rewardItemID = game.type[int] ], "Returns any reward item for an achievement."),
+	C_AchievementInfo.GetSupercedingAchievements = game.new(C_AchievementInfo.GetSupercedingAchievements, [ achievementID = game.type[int] ], [ supercedingAchievements = game.type[var] ], "Returns the next achievement in a series."),
+	C_AchievementInfo.IsValidAchievement = game.new(C_AchievementInfo.IsValidAchievement, [ achievementID = game.type[int] ], [ isValidAchievement = game.type[boolean] ], "Needs summary.")
+]
+*/
+
+achievements = [
+	GetNextAchievement = game.new(GetNextAchievement, [ achievementID = game.type[INT] ], [ nextAchievementID = game.type[INT] ], "Return the next achievement in a chain.") 
+]
+
+game = game.addCategory("achievements", achievements)
+
+return game

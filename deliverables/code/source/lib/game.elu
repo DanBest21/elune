@@ -1,0 +1,57 @@
+game = []
+
+game.type = [
+	NULL = 1,
+	INT = 2,
+	FLOAT = 3,
+	BOOLEAN = 4,
+	FUNCTION = 5,
+	VAR = 6
+]
+
+/*
+global def game.getCategories()
+{
+	names = []
+}
+*/
+
+global def game.addCategory(name, contents)
+{
+	game[name] = contents
+	return game
+}
+
+global def game.getCategory(name)
+{
+	return game[name]
+}
+
+global def game.call(category, name, ...)
+{
+	value = game[category].name["Function"](...)
+
+	if value is not null
+	{
+		return value
+	}
+}
+
+global def game.new(f, params, ret, desc)
+{
+	record = [ 
+		Function = f,
+		Parameters = params,
+		Return_Values = ret,
+		Description = desc
+	]
+
+	return record
+}
+
+global def game.getDescription(category, name)
+{
+	return game[category][name]["Description"]
+} 
+
+return game

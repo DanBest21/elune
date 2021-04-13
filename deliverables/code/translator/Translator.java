@@ -78,11 +78,12 @@ public class Translator
         {
             if (importStdLibrary)
             {
-                generateFile("./source/lib/std.elu");
+                generateFile("./source/lib/std.elu", false);
 
                 Map<String, Object> map = new HashMap<>();
 
                 map.put("name", "std");
+                map.put("assign", false);
 
                 if (innerTranslator)
                     translatedCode.append(" ").append(Renderer.gen("importModule", map, true)).append(";");
@@ -247,18 +248,28 @@ public class Translator
 
             List<String> args = new ArrayList<>();
 
-            for (int i = 0; i < ctx.funcbody().parlist().namelist().getChildCount(); i++)
+            if (ctx.funcbody().parlist() != null)
             {
-                if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
+                if (ctx.funcbody().parlist().namelist() != null)
                 {
-                    String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
-                    args.add(arg);
-                    newBlock.putVarInScope(arg);
+                    for (int i = 0; i < ctx.funcbody().parlist().namelist().getChildCount(); i++)
+                    {
+                        if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
+                        {
+                            String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
+                            args.add(arg);
+                            newBlock.putVarInScope(arg);
+                        }
+                    }
+
+                    if (ctx.funcbody().parlist().getChildCount() > 1)
+                        args.add("...");
+                }
+                else
+                {
+                    args.add("...");
                 }
             }
-
-            if (ctx.funcbody().parlist().getChildCount() > 1)
-                args.add("...");
 
             map.put("args", args);
 
@@ -299,18 +310,28 @@ public class Translator
 
             List<String> args = new ArrayList<>();
 
-            for (int i = 0; i < ctx.funcbody().parlist().namelist().getChildCount(); i++)
+            if (ctx.funcbody().parlist() != null)
             {
-                if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
+                if (ctx.funcbody().parlist().namelist() != null)
                 {
-                    String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
-                    args.add(arg);
-                    newBlock.putVarInScope(arg);
+                    for (int i = 0; i < ctx.funcbody().parlist().namelist().getChildCount(); i++)
+                    {
+                        if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
+                        {
+                            String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
+                            args.add(arg);
+                            newBlock.putVarInScope(arg);
+                        }
+                    }
+
+                    if (ctx.funcbody().parlist().getChildCount() > 1)
+                        args.add("...");
+                }
+                else
+                {
+                    args.add("...");
                 }
             }
-
-            if (ctx.funcbody().parlist().getChildCount() > 1)
-                args.add("...");
 
             map.put("args", args);
 
@@ -351,18 +372,28 @@ public class Translator
 
             List<String> args = new ArrayList<>();
 
-            for (int i = 0; i < ctx.funcbody().parlist().namelist().getChildCount(); i++)
+            if (ctx.funcbody().parlist() != null)
             {
-                if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
+                if (ctx.funcbody().parlist().namelist() != null)
                 {
-                    String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
-                    args.add(arg);
-                    newBlock.putVarInScope(arg);
+                    for (int i = 0; i < ctx.funcbody().parlist().namelist().getChildCount(); i++)
+                    {
+                        if (!ctx.funcbody().parlist().namelist().getChild(i).getText().equals(","))
+                        {
+                            String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
+                            args.add(arg);
+                            newBlock.putVarInScope(arg);
+                        }
+                    }
+
+                    if (ctx.funcbody().parlist().getChildCount() > 1)
+                        args.add("...");
+                }
+                else
+                {
+                    args.add("...");
                 }
             }
-
-            if (ctx.funcbody().parlist().getChildCount() > 1)
-                args.add("...");
 
             map.put("args", args);
 
@@ -934,16 +965,13 @@ public class Translator
 
                 map.put("args", args);
 
-                if (innerTranslator)
-                    functionCall.append(Renderer.gen("prefixExp", map, true));
-                else
-                    functionCall.append(Renderer.gen("prefixExp", map));
+                functionCall.append(Renderer.gen("prefixExp", map, true));
             }
 
             if (innerTranslator)
                 translatedCode.append(" ").append(functionCall).append(";");
             else
-                translatedCode.append(functionCall).append("\n");
+                translatedCode.append(Renderer.getTab()).append(functionCall).append("\n");
         }
 
         @Override
@@ -1027,6 +1055,7 @@ public class Translator
             Map<String, Object> map = new HashMap<>();
 
             map.put("name", ctx.NAME().getText().toLowerCase(Locale.ROOT));
+            map.put("assign", true);
 
             if (innerTranslator)
                 translatedCode.append(" ").append(Renderer.gen("importModule", map, true)).append(";");
@@ -1092,7 +1121,25 @@ public class Translator
         }
 
         @Override
-        public String visitNumber(EluneParser.NumberContext ctx)
+        public String visitInt(EluneParser.IntContext ctx)
+        {
+            return ctx.getText();
+        }
+
+        @Override
+        public String visitHex(EluneParser.HexContext ctx)
+        {
+            return ctx.getText();
+        }
+
+        @Override
+        public String visitFloat(EluneParser.FloatContext ctx)
+        {
+            return ctx.getText();
+        }
+
+        @Override
+        public String visitHexFloat(EluneParser.HexFloatContext ctx)
         {
             return ctx.getText();
         }
@@ -1324,6 +1371,12 @@ public class Translator
         }
 
         @Override
+        public String visitAllArgs(EluneParser.AllArgsContext ctx)
+        {
+            return "...";
+        }
+
+        @Override
         public String visitConcat(EluneParser.ConcatContext ctx)
         {
             Map<String, Object> map = new HashMap<>();
@@ -1444,6 +1497,24 @@ public class Translator
         }
     }
 
+    private class EluneExpression
+    {
+        private final String expression;
+        private final EluneType type;
+
+        public EluneExpression(String expression, EluneType type)
+        {
+            this.expression = expression;
+            this.type = type;
+        }
+
+        @Override
+        public String toString()
+        {
+            return expression;
+        }
+    }
+
     private static class Renderer
     {
         private static final STGroup stf = new STGroupFile("templates/"
@@ -1510,10 +1581,10 @@ public class Translator
     public static void main(String[] args)
     {
         targetLanguage = args[1];
-        generateFile(args[0], true);
+        generateFile(args[0]);
     }
 
-    public static void generateFile(String pathname) { generateFile(pathname, false); }
+    public static void generateFile(String pathname) { generateFile(pathname, true); }
 
     public static void generateFile(String pathname, boolean importStd)
     {

@@ -268,7 +268,10 @@ operatorPower
     : '^';
 
 number
-    : INT | HEX | FLOAT | HEX_FLOAT
+    : INT                                                                           #int
+    | HEX                                                                           #hex
+    | FLOAT                                                                         #float
+    | HEX_FLOAT                                                                     #hexFloat
     ;
 
 string

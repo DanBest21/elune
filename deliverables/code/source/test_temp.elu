@@ -289,3 +289,43 @@ finally
 	print "Not even Wensleydale?"
 }
 */
+
+/*
+xs = [1, 2, 3, 4, 5]
+ys = [6, 7, 8, 9, 10]
+
+ms = merge(xs, ys)
+
+foreach x in filter(lambda x { return x % 30 == 0 }, map(lambda x { return x * 10 }, split(3, 7, ms)))
+{
+	print x
+}
+
+x = 6
+
+if (x == 6)
+{
+	print -(10 * (-10))
+}
+else
+{
+	print "NO"
+}
+*/
+
+day = [
+	MONDAY = 1,
+	TUESDAY = 2,
+	WEDNESDAY = 3,
+	THURSDAY = 4,
+	FRIDAY = 5,
+	SATURDAY = 6,
+	SUNDAY = 7
+]
+
+itis = day.WEDNESDAY
+
+if itis == day.WEDNESDAY
+{
+	print "It is Wednesday my dude."
+}

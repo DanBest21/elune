@@ -1,0 +1,142 @@
+global def append(x, xs)
+{
+	xs[length xs + 1] = x
+	return xs
+}
+
+global def insert(x, xs, pos)
+{
+	ys = []
+	
+	for i = 0, i < pos, i += 1
+	{
+		ys[i] = xs[i]
+	}
+	
+	ys[pos] = x
+	
+	for i = pos, i <= length xs, i += 1
+	{
+		ys[i] = xs[i - 1]
+	}
+	
+	return ys
+}
+
+global def head(xs)
+{
+	return xs[1]
+}
+
+global def tail(xs)
+{
+	ys = []
+	
+	for i = 0, i < length xs, i += 1
+	{
+		ys[i] = xs[i + 1] 
+	}
+	
+	return ys
+}
+
+global def last(xs)
+{
+	return xs[length xs]
+}
+
+global def init(xs)
+{
+	ys = []
+	
+	for i = 0, i < length xs - 1, i += 1
+	{
+		ys[i] = xs[i]
+	}
+	
+	return ys
+}
+
+global def merge(xs, ys)
+{
+	ms = []
+	
+	i = 1
+	
+	foreach x in xs
+	{
+		ms[i] = x
+		i += 1
+	}
+	
+	foreach y in ys
+	{
+		ms[i] = y
+		i += 1
+	}
+	
+	return ms
+}
+
+global def split(s, e, xs)
+{
+	if s == null { s = 0 }
+	if e == null { e = length xs - 1 }
+	if e < 0 { e = length xs - 1 - e }
+	
+	ys = []
+	j = 1
+	
+	for i = s - 1, i < e, i += 1
+	{
+		ys[j] = xs[i]
+		j += 1
+	}
+	
+	return ys
+}
+
+global def map(f, xs)
+{
+	for i = 0, i < length xs, i += 1
+	{
+		xs[i] = f(xs[i])
+	}
+	
+	return xs
+}
+
+global def filter(b, xs)
+{
+	ys = []
+	i = 0
+	
+	foreach x in xs
+	{
+		if b(x)
+		{
+			i += 1
+			ys[i] = x
+		}
+	}
+	
+	return ys
+}
+
+global def foldl(f, acc, xs)
+{
+	if length xs == 0 { return acc }
+	
+	acc = f(acc, head(xs))
+	
+	return foldl(f, acc, tail(xs))
+}
+
+global def foldr(f, acc, xs)
+{
+	if length xs == 0 { return acc }
+	
+	x = head(xs)
+	
+	return f(x, foldr(f, acc, tail(xs)))
+}

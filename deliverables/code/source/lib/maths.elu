@@ -1,0 +1,87 @@
+math = []
+
+global def math.min(...)
+{
+	minValue = arg[1]
+	
+	foreach x in arg
+	{
+		if x < minValue { minValue = x }
+	}
+	
+	return minValue
+}
+
+global def math.max(...)
+{
+	maxValue = arg[1]
+	
+	foreach x in arg
+	{
+		if x > maxValue { maxValue = x }
+	}
+	
+	return maxValue
+}
+
+global def math.add(x, y)
+{
+	return x + y
+}
+
+global def math.sub(x, y)
+{
+	return x - y
+}
+
+global def math.multiply(x, y)
+{
+	return x * y
+}
+
+global def math.divide(x, y)
+{
+	return x / y
+}
+
+global def math.pow(x, y)
+{
+	return x ^ y
+}
+
+global def math.root(x, y)
+{
+	return x ^ (1 / y)
+}
+
+global def math.modulo(x, y)
+{
+	return x % y
+}
+
+global def math.sqrt(x)
+{
+	return math.root(x, 2)
+}
+
+global def math.sum(xs)
+{
+	return foldl(math.add, 0, xs)
+}
+
+global def math.product(xs)
+{
+	return foldl(math.multiply, 1, xs)
+}
+
+global def math.isEven(x)
+{
+	return x % 2 == 0
+}
+
+global def math.isOdd(x)
+{
+	return x % 2 != 0
+}
+
+return math
