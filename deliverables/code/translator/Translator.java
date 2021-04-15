@@ -105,7 +105,7 @@ public class Translator
         public void enterBreak(EluneParser.BreakContext ctx)
         {
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("break", null, true)).append(";");
+                translatedCode.append(" ").append(Renderer.gen("break", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("break", null)).append("\n");
         }
@@ -118,7 +118,7 @@ public class Translator
             map.put("num", loopCount);
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("continue", map, true)).append(";");
+                translatedCode.append(" ").append(Renderer.gen("continue", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("continue", map)).append("\n");
         }
@@ -131,7 +131,7 @@ public class Translator
             map.put("text", ctx.NAME().getText());
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("label", map, true)).append(";");
+                translatedCode.append(" ").append(Renderer.gen("label", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("label", map)).append("\n");
         }
@@ -144,7 +144,7 @@ public class Translator
             map.put("label", ctx.NAME().getText());
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("goto", map, true)).append(";");
+                translatedCode.append(" ").append(Renderer.gen("goto", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("goto", map)).append("\n");
         }
@@ -193,6 +193,7 @@ public class Translator
 
             Map<String, Object> map = new HashMap<>();
             boolean isDec = true;
+            boolean isElement = false;
             List<String> scope = getScope();
 
             List<String> varList = new ArrayList<>();
@@ -200,6 +201,9 @@ public class Translator
             for (int i = 0; i < ctx.varlist().getChildCount(); i++)
             {
                 String varName = ctx.varlist().getChild(i).getText().equals(",") ? "," : exprTranslator.visit(ctx.varlist().getChild(i));
+
+                if (varName.contains("."))
+                    isElement = true;
 
                 if (scope.contains(varName.split("\\[")[0]))
                     isDec = false;
@@ -224,7 +228,9 @@ public class Translator
 
             String templateName;
 
-            if (isDec)
+            if (isElement)
+                templateName = "globalVar";
+            else if (isDec)
                 templateName = "varDec";
             else
                 templateName = "varAssign";
@@ -259,15 +265,20 @@ public class Translator
                             String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
                             args.add(arg);
                             newBlock.putVarInScope(arg);
+                            newBlock.addParam(arg);
                         }
                     }
 
                     if (ctx.funcbody().parlist().getChildCount() > 1)
+                    {
                         args.add("...");
+                        newBlock.addParam("...");
+                    }
                 }
                 else
                 {
                     args.add("...");
+                    newBlock.addParam("...");
                 }
             }
 
@@ -321,15 +332,20 @@ public class Translator
                             String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
                             args.add(arg);
                             newBlock.putVarInScope(arg);
+                            newBlock.addParam(arg);
                         }
                     }
 
                     if (ctx.funcbody().parlist().getChildCount() > 1)
+                    {
                         args.add("...");
+                        newBlock.addParam("...");
+                    }
                 }
                 else
                 {
                     args.add("...");
+                    newBlock.addParam("...");
                 }
             }
 
@@ -383,15 +399,20 @@ public class Translator
                             String arg = exprTranslator.visit(ctx.funcbody().parlist().namelist().getChild(i));
                             args.add(arg);
                             newBlock.putVarInScope(arg);
+                            newBlock.addParam(arg);
                         }
                     }
 
                     if (ctx.funcbody().parlist().getChildCount() > 1)
+                    {
                         args.add("...");
+                        newBlock.addParam("...");
+                    }
                 }
                 else
                 {
                     args.add("...");
+                    newBlock.addParam("...");
                 }
             }
 
@@ -436,7 +457,7 @@ public class Translator
             Block newBlock = new Block(currentBlock);
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("do", null, true));
+                translatedCode.append(" ").append(Renderer.gen("do", null, true));
             else
                 translatedCode.append(Renderer.gen("do", null)).append("\n");
 
@@ -468,7 +489,7 @@ public class Translator
             Block newBlock = new Block(currentBlock);
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("doWhile", null, true));
+                translatedCode.append(" ").append(Renderer.gen("doWhile", null, true));
             else
                 translatedCode.append(Renderer.gen("doWhile", null)).append("\n");
 
@@ -511,7 +532,7 @@ public class Translator
             map.put("cond", exprTranslator.visit(ctx.exp()));
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("while", map, true));
+                translatedCode.append(" ").append(Renderer.gen("while", map, true));
             else
                 translatedCode.append(Renderer.gen("while", map)).append("\n");
 
@@ -557,7 +578,7 @@ public class Translator
             map.put("inc", exprTranslator.visit(ctx.exp(2)));
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("for", map, true));
+                translatedCode.append(" ").append(Renderer.gen("for", map, true));
             else
                 translatedCode.append(Renderer.gen("for", map)).append("\n");
 
@@ -596,7 +617,16 @@ public class Translator
 
             Block newBlock = new Block(currentBlock);
 
-            map.put("element", ctx.NAME().getText());
+            if (ctx.NAME().size() > 1)
+            {
+                map.put("index", ctx.NAME(0).getText());
+                map.put("element", ctx.NAME(1).getText());
+            }
+            else
+            {
+                map.put("element", ctx.NAME(0).getText());
+            }
+
             map.put("list", exprTranslator.visit(ctx.explist()));
 
             if (innerTranslator)
@@ -786,7 +816,7 @@ public class Translator
             }
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("switch", map, true)).append(";");
+                translatedCode.append(" ").append(Renderer.gen("switch", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("switch", map)).append("\n\n");
         }
@@ -818,8 +848,10 @@ public class Translator
 
             map.put("block", translator.render());
 
+            map.put("args", getFunctionParams());
+
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("try", map, true));
+                translatedCode.append(" ").append(Renderer.gen("try", map, true));
             else
                 translatedCode.append(Renderer.gen("try", map)).append("\n");
         }
@@ -857,7 +889,7 @@ public class Translator
                 map.put("action", translator.render());
 
                 if (innerTranslator)
-                    translatedCode.append(Renderer.gen("catch", map, true));
+                    translatedCode.append(" ").append(Renderer.gen("catch", map, true));
                 else
                     translatedCode.append(Renderer.gen("catch", map)).append("\n");
             }
@@ -892,7 +924,7 @@ public class Translator
             map.put("block", translator.render());
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("end", null, true)).append("\n").append(Renderer.gen("finally", map, true)).append(";");
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append("\n").append(Renderer.gen("finally", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n").append(Renderer.gen("finally", map)).append("\n");
         }
@@ -912,14 +944,14 @@ public class Translator
             if (innerTranslator)
             {
                 if (ctx.finallyStmt() == null)
-                    translatedCode.append(Renderer.gen("end", null, true)).append(";");
+                    translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
                 else
                     translatedCode.append(";");
             }
             else
             {
                 if (ctx.finallyStmt() == null)
-                    translatedCode.append(Renderer.gen("end", null, true)).append("\n\n");
+                    translatedCode.append(" ").append(Renderer.gen("end", null, true)).append("\n\n");
                 else
                     translatedCode.append("\n\n");
             }
@@ -936,7 +968,7 @@ public class Translator
             map.put("return", ctx.NAME().getText());
 
             if (innerTranslator)
-                translatedCode.append(Renderer.gen("exception", map, true)).append(";");
+                translatedCode.append(" ").append(Renderer.gen("exception", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("exception", map)).append("\n");
         }
@@ -953,17 +985,12 @@ public class Translator
             for (int i = 0; i < ctx.nameAndArgs().size(); i++)
             {
                 Map<String, Object> map = new HashMap<>();
-                List<String> args = new ArrayList<>();
 
                 if (ctx.nameAndArgs(i).NAME() != null)
-                    map.put("name", ":" + exprTranslator.visit(ctx.nameAndArgs(i).NAME()));
+                    map.put("name", ctx.nameAndArgs(i).NAME().getText());
 
-                for (int j = 0; j < ctx.nameAndArgs(i).getChildCount(); j++)
-                {
-                    args.add(exprTranslator.visit(ctx.nameAndArgs(i).args()));
-                }
-
-                map.put("args", args);
+                if (ctx.nameAndArgs(i).args() != null)
+                    map.put("args", exprTranslator.visit(ctx.nameAndArgs(i).args()));
 
                 functionCall.append(Renderer.gen("prefixExp", map, true));
             }
@@ -1065,12 +1092,27 @@ public class Translator
 
         public List<String> getScope()
         {
-            List<String> scope = new ArrayList<>(globalScope);
-
-            if (currentBlock != null)
-                scope.addAll(currentBlock.getScope());
-
+            List<String> scope = getGlobalScope();
+            scope.addAll(Objects.requireNonNull(getLocalScope()));
             return scope;
+        }
+
+        public List<String> getGlobalScope()
+        {
+            return globalScope;
+        }
+
+        public List<String> getLocalScope()
+        {
+            if (currentBlock != null)
+                return currentBlock.getScope();
+            else
+                return null;
+        }
+
+        public List<String> getFunctionParams()
+        {
+            return currentBlock.getParams();
         }
 
         public String render()
@@ -1082,6 +1124,7 @@ public class Translator
     private static class Block
     {
         private final List<String> blockScope = new ArrayList<>();
+        private final Set<String> params = new HashSet<>();
         private final Block parentBlock;
 
         public Block(Block parentBlock)
@@ -1094,6 +1137,11 @@ public class Translator
             blockScope.add(varName);
         }
 
+        public void addParam(String parameterName)
+        {
+            params.add(parameterName);
+        }
+
         public List<String> getScope()
         {
             List<String> scope = new ArrayList<>(blockScope);
@@ -1102,6 +1150,16 @@ public class Translator
                 scope.addAll(parentBlock.getScope());
 
             return scope;
+        }
+
+        public List<String> getParams()
+        {
+            List<String> params = new ArrayList<>(this.params);
+
+            if (parentBlock != null)
+                params.addAll(parentBlock.getParams());
+
+            return params;
         }
     }
 
@@ -1305,17 +1363,12 @@ public class Translator
             for (int i = 0; i < ctx.nameAndArgs().size(); i++)
             {
                 Map<String, Object> map = new HashMap<>();
-                List<String> args = new ArrayList<>();
 
                 if (ctx.nameAndArgs(i).NAME() != null)
-                    map.put("name", ":" + this.visit(ctx.nameAndArgs(i).NAME()));
+                    map.put("name", ctx.nameAndArgs(i).NAME().getText());
 
-                for (int j = 0; j < ctx.nameAndArgs(i).getChildCount(); j++)
-                {
-                    args.add(this.visit(ctx.nameAndArgs(i).args()));
-                }
-
-                map.put("args", args);
+                if (ctx.nameAndArgs(i).args() != null)
+                    map.put("args", this.visit(ctx.nameAndArgs(i).args()));
 
                 functionCall.append(Renderer.gen("prefixExp", map, true));
             }
@@ -1360,9 +1413,12 @@ public class Translator
             Map<String, Object> map = new HashMap<>();
             List<String> args = new ArrayList<>();
 
-            for (int i = 0; i < ctx.explist().getChildCount(); i++)
+            if (ctx.explist() != null)
             {
-                args.add(this.visit(ctx.explist().getChild(i)));
+                for (int i = 0; i < ctx.explist().getChildCount(); i++)
+                {
+                    args.add(this.visit(ctx.explist().getChild(i)));
+                }
             }
 
             map.put("args", args);

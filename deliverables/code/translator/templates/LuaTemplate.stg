@@ -40,7 +40,7 @@ forEnd(inc, num) ::= <<
     <inc>
     ::continue_<num>::
 end >>
-forEach(element, list) ::= << for _, <element> in ipairs(<list>) do >>
+forEach(index, element, list) ::= << for <if(index)><index><else>_<endif>, <element> in <if(index)>pairs<else>ipairs<endif>(<list>) do >>
 
 if(cond) ::= << if <cond> then >>
 elseIf(cond) ::= << elseif <cond> then >>
@@ -60,8 +60,8 @@ end
 >>
 switchCase(case, action) ::= << [<case>] = function()<action> end >>
 
-try(block) ::= <<
-local status, err = pcall(function() <block> end)
+try(args, block) ::= <<
+local status, err = pcall(function(<args; separator = ", ">) <block> end)
 if not status then
 >>
 catch(exception, action) ::= <<

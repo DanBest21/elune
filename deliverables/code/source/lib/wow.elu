@@ -3,18 +3,27 @@ import game
 // Custom types
 game.type = append("TEXTURE", game.type)
 
-/*
-achievements = [
-	C_AchievementInfo.GetRewardItemID = game.new(C_AchievementInfo.GetRewardItemID, [ achievementID = game.type[int] ], [ rewardItemID = game.type[int] ], "Returns any reward item for an achievement."),
-	C_AchievementInfo.GetSupercedingAchievements = game.new(C_AchievementInfo.GetSupercedingAchievements, [ achievementID = game.type[int] ], [ supercedingAchievements = game.type[var] ], "Returns the next achievement in a series."),
-	C_AchievementInfo.IsValidAchievement = game.new(C_AchievementInfo.IsValidAchievement, [ achievementID = game.type[int] ], [ isValidAchievement = game.type[boolean] ], "Needs summary.")
+achievements = 
+[
+	GetRewardItemID = game.new(/*C_AchievementInfo.GetRewardItemID*/ null, [ achievementID = game.type[int] ], [ rewardItemID = game.type[int] ], "Returns any reward item for an achievement.", null),
+	GetSupercedingAchievements = game.new(/*C_AchievementInfo.GetSupercedingAchievements*/ null, [ achievementID = game.type[int] ], [ supercedingAchievements = game.type[var] ], "Returns the next achievement in a series.", null),
+	IsValidAchievement = game.new(/*C_AchievementInfo.IsValidAchievement*/ null, [ achievementID = game.type[int] ], [ isValidAchievement = game.type[boolean] ], "Needs summary.", null),
+	GetNextAchievement = game.new(GetNextAchievement, [ achievementID = game.type[INT] ], [ nextAchievementID = game.type[INT] ], "Return the next achievement in a chain.", null),
+	IsTrackedAchievement = game.new(IsTrackedAchievement, [ achievementID = game.type[INT] ], [ eligible = game.type[BOOLEAN] ], "Returns if an achievement is currently being tracked.", null),
+	IsAchievementEligible = game.new(IsAchievementEligible, [ achievementID = game.type[INT] ], [ eligible = game.type[BOOLEAN] ], "Indicates whether the specified achievement is eligible to be completed.", null),
+	SetAchievementSearchString = game.new(SetAchievementSearchString, [ searchText = game.type[STRING] ], [ searchFinished = game.type[BOOLEAN] ], "Starts a search for achievements containing the specified text.", null)
 ]
-*/
 
-achievements = [
-	GetNextAchievement = game.new(GetNextAchievement, [ achievementID = game.type[INT] ], [ nextAchievementID = game.type[INT] ], "Return the next achievement in a chain.") 
+game:addCategory("achievements", achievements)
+
+calendar = 
+[
+	CanAddEvent = game.new(/*C_Calendar.CanAddEvent*/ null, [], [ canAddEvent = game.type[BOOLEAN] ], "Returns whether the player can add an event.", null),
+	EventDecline = game.new(/*C_Calendar.EventDecline*/ null, [], [], "Declines the invitation to the currently open event.", null),
+	OpenCalendar = game.new(/*C_Calendar.OpenCalendar*/ null, [], [], "Requests calendar information from the server. Does not open the calendar frame.", "Fires CALENDAR_UPDATE_EVENT_LIST, when your query has finished processing on the server and new calendar information is available. If called during the loading process, (even at PLAYER_ENTERING_WORLD) the query will not return."),
+	OpenEvent = game.new(/*C_Calendar.OpenEvent*/ null, [ offsetMonths = game.type[INT], monthDay = game.type[INT], index = game.type[INT] ], [ success = game.type[BOOLEAN] ], "Establishes an event for future calendar API calls", null)
 ]
 
-game = game.addCategory("achievements", achievements)
+game:addCategory("calendar", calendar)
 
 return game

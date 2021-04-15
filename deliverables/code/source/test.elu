@@ -1,3 +1,8 @@
 import wow
 
-print wow.getDescription("achievements", "GetNextAchievement")
+print wow:getDescription("calendar", "EventDecline")
+
+foreach category in wow:getCategories()
+{
+	print category
+}

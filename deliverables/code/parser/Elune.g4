@@ -63,7 +63,7 @@ stat
     | 'do' '{' block '}' 'while' exp                                                    #doWhile
     | ifStmt elseIfStmt* elseStmt?                                                      #ifElse
     | 'for' NAME '=' exp ',' exp (',' exp)? '{' block '}'                               #for
-    | 'foreach' NAME 'in' explist '{' block '}'                                         #foreach
+    | 'foreach' (NAME ',')? NAME 'in' explist '{' block '}'                             #foreach
     | 'global' 'def' funcname funcbody                                                  #globalFunc
     | 'def' NAME funcbody                                                               #func
     | 'def' funcname funcbody                                                           #objFunc
@@ -197,7 +197,7 @@ nameAndArgs
 
 args
     : '(' explist? ')'                                                              #exprArgs
-    | tableconstructor                                                              #tableconstructorArgs
+//  | tableconstructor                                                              #tableconstructorArgs
     | string                                                                        #stringArgs
     ;
 

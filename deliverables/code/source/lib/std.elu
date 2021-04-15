@@ -140,3 +140,11 @@ global def foldr(f, acc, xs)
 	
 	return f(x, foldr(f, acc, tail(xs)))
 }
+
+global def printList(xs)
+{
+	foreach x in xs
+	{
+		print x
+	}
+}
