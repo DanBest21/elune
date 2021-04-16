@@ -223,7 +223,8 @@ parlist
     ;
 
 tableconstructor
-    : '[' fieldlist? ']'
+    : '[' explist? ']'                                                              #array
+    | '{' fieldlist? '}'                                                            #dictionary
     ;
 
 fieldlist

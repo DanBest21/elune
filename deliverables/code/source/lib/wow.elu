@@ -1,28 +1,28 @@
 import game
 
 // Custom types
-game.type = append("TEXTURE", game.type)
+game.dataType["TEXTURE"] = length game.dataType
 
 achievements = 
-[
-	GetRewardItemID = game.new(/*C_AchievementInfo.GetRewardItemID*/ null, [ achievementID = game.type[int] ], [ rewardItemID = game.type[int] ], "Returns any reward item for an achievement.", null),
-	GetSupercedingAchievements = game.new(/*C_AchievementInfo.GetSupercedingAchievements*/ null, [ achievementID = game.type[int] ], [ supercedingAchievements = game.type[var] ], "Returns the next achievement in a series.", null),
-	IsValidAchievement = game.new(/*C_AchievementInfo.IsValidAchievement*/ null, [ achievementID = game.type[int] ], [ isValidAchievement = game.type[boolean] ], "Needs summary.", null),
-	GetNextAchievement = game.new(GetNextAchievement, [ achievementID = game.type[INT] ], [ nextAchievementID = game.type[INT] ], "Return the next achievement in a chain.", null),
-	IsTrackedAchievement = game.new(IsTrackedAchievement, [ achievementID = game.type[INT] ], [ eligible = game.type[BOOLEAN] ], "Returns if an achievement is currently being tracked.", null),
-	IsAchievementEligible = game.new(IsAchievementEligible, [ achievementID = game.type[INT] ], [ eligible = game.type[BOOLEAN] ], "Indicates whether the specified achievement is eligible to be completed.", null),
-	SetAchievementSearchString = game.new(SetAchievementSearchString, [ searchText = game.type[STRING] ], [ searchFinished = game.type[BOOLEAN] ], "Starts a search for achievements containing the specified text.", null)
-]
+{
+	GetRewardItemID = game.new(/*C_AchievementInfo.GetRewardItemID*/ null, game.methodType.GET, { achievementID = game.dataType.INT }, { rewardItemID = game.dataType.INT }, "Returns any reward item for an achievement.", null),
+	GetSupercedingAchievements = game.new(/*C_AchievementInfo.GetSupercedingAchievements*/ null, game.methodType.GET, { achievementID = game.dataType.INT }, { supercedingAchievements = game.dataType[VAR] }, "Returns the next achievement in a series.", null),
+	IsValidAchievement = game.new(/*C_AchievementInfo.IsValidAchievement*/ null, game.methodType.CHECK, { achievementID = game.dataType.INT }, { isValidAchievement = game.dataType.BOOLEAN }, "Needs summary.", null),
+	GetNextAchievement = game.new(GetNextAchievement, game.methodType.GET, { achievementID = game.dataType.INT }, { nextAchievementID = game.dataType.INT }, "Return the next achievement in a chain.", null),
+	IsTrackedAchievement = game.new(IsTrackedAchievement, game.methodType.CHECK, { achievementID = game.dataType.INT }, { eligible = game.dataType.BOOLEAN }, "Returns if an achievement is currently being tracked.", null),
+	IsAchievementEligible = game.new(IsAchievementEligible, game.methodType.CHECK, { achievementID = game.dataType.INT }, { eligible = game.dataType.BOOLEAN }, "Indicates whether the specified achievement is eligible to be completed.", null),
+	SetAchievementSearchString = game.new(SetAchievementSearchString, game.methodType.SET, { searchText = game.dataType.STRING }, { searchFinished = game.dataType.BOOLEAN }, "Starts a search for achievements containing the specified text.", null)
+}
 
 game:addCategory("achievements", achievements)
 
 calendar = 
-[
-	CanAddEvent = game.new(/*C_Calendar.CanAddEvent*/ null, [], [ canAddEvent = game.type[BOOLEAN] ], "Returns whether the player can add an event.", null),
-	EventDecline = game.new(/*C_Calendar.EventDecline*/ null, [], [], "Declines the invitation to the currently open event.", null),
-	OpenCalendar = game.new(/*C_Calendar.OpenCalendar*/ null, [], [], "Requests calendar information from the server. Does not open the calendar frame.", "Fires CALENDAR_UPDATE_EVENT_LIST, when your query has finished processing on the server and new calendar information is available. If called during the loading process, (even at PLAYER_ENTERING_WORLD) the query will not return."),
-	OpenEvent = game.new(/*C_Calendar.OpenEvent*/ null, [ offsetMonths = game.type[INT], monthDay = game.type[INT], index = game.type[INT] ], [ success = game.type[BOOLEAN] ], "Establishes an event for future calendar API calls", null)
-]
+{
+	CanAddEvent = game.new(/*C_Calendar.CanAddEvent*/ null, game.methodType.CHECK, {}, { canAddEvent = game.dataType.BOOLEAN }, "Returns whether the player can add an event.", null),
+	EventDecline = game.new(/*C_Calendar.EventDecline*/ null, game.methodType.UI, {}, {}, "Declines the invitation to the currently open event.", null),
+	OpenCalendar = game.new(/*C_Calendar.OpenCalendar*/ null, game.methodType.UI, {}, {}, "Requests calendar information from the server. Does not open the calendar frame.", "Fires CALENDAR_UPDATE_EVENT_LIST, when your query has finished processing on the server and new calendar information is available. If called during the loading process, (even at PLAYER_ENTERING_WORLD) the query will not return."),
+	OpenEvent = game.new(/*C_Calendar.OpenEvent*/ null, game.methodType.UI, { offsetMonths = game.dataType.INT, monthDay = game.dataType.INT, index = game.dataType.INT }, { success = game.dataType.BOOLEAN }, "Establishes an event for future calendar API calls", null)
+}
 
 game:addCategory("calendar", calendar)
 

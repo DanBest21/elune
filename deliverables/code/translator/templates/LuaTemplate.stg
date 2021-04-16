@@ -77,3 +77,6 @@ operatorExpr(x, y, symbol) ::= << <x> <symbol> <y> >>
 compoundAssign(x, y, symbol) ::= << <x> = <x> <symbol> <y> >>
 
 len(var) ::= << #<var> >>
+
+array(elements) ::= << {<if(elements)><elements; separator = ", "><endif>} >>
+dictionary(elements) ::= << {<if(elements)><elements; separator = ", "><endif>} >>

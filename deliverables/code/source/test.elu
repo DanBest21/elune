@@ -1,8 +1,19 @@
 import wow
 
+/*
 print wow:getDescription("calendar", "EventDecline")
 
 foreach category in wow:getCategories()
 {
 	print category
 }
+
+print "Methods of type GET:"
+
+foreach name, _ in wow:getRecordsOnType(wow.methodType.GET)
+{
+	print name
+}
+*/
+
+print wow:get("nextAchievementID")

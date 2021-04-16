@@ -1289,25 +1289,43 @@ public class Translator
         }
 
         @Override
-        public String visitTableconstructor(EluneParser.TableconstructorContext ctx)
+        public String visitArray(EluneParser.ArrayContext ctx)
         {
-            if (ctx.fieldlist() != null)
-                return "{" + this.visit(ctx.fieldlist()) + "}";
-            else
-                return "{}";
+            Map<String, Object> map = new HashMap<>();
+
+            List<String> elements = new ArrayList<>();
+
+            if (ctx.explist() != null)
+            {
+                for (int i = 0; i < ctx.explist().exp().size(); i++)
+                {
+                    elements.add(this.visit(ctx.explist().exp(i)));
+                }
+            }
+
+            map.put("elements", elements);
+
+            return Renderer.gen("dictionary", map, true);
         }
 
         @Override
-        public String visitFieldlist(EluneParser.FieldlistContext ctx)
+        public String visitDictionary(EluneParser.DictionaryContext ctx)
         {
-            StringBuilder fieldList = new StringBuilder();
+            Map<String, Object> map = new HashMap<>();
 
-            for (int i = 0; i < ctx.getChildCount(); i++)
+            List<String> elements = new ArrayList<>();
+
+            if (ctx.fieldlist() != null)
             {
-                fieldList.append(this.visit(ctx.getChild(i)));
+                for (int i = 0; i < ctx.fieldlist().field().size(); i++)
+                {
+                    elements.add(this.visit(ctx.fieldlist().field(i)));
+                }
             }
 
-            return fieldList.toString();
+            map.put("elements", elements);
+
+            return Renderer.gen("dictionary", map, true);
         }
 
         @Override

@@ -1,16 +1,24 @@
-game = []
+game = {}
 
-game.map = []
+game.map = {}
 
-game.type = 
-[
+game.dataType = 
+{
 	NULL = 1,
 	INT = 2,
 	FLOAT = 3,
 	BOOLEAN = 4,
 	FUNCTION = 5,
 	VAR = 6
-]
+}
+
+game.methodType =
+{
+	GET = 1,
+	SET = 2,
+	CHECK = 3,
+	UI = 4
+}
 
 global def game:getCategories()
 {
@@ -26,6 +34,54 @@ global def game:getCategories()
 	return categories
 }
 
+global def game:getRecordsOnType(methodType)
+{
+	records = {}
+	
+	foreach _, category in game.map
+	{			
+		foreach name, record in category
+		{
+			if record.methodType is methodType
+			{
+				records[name] = record
+			}
+		}
+	}
+	
+	return records
+}
+
+global def game:get(attribute)
+{
+	methods = game:getRecordsOnType(game.methodType.GET)
+	
+	foreach methodName, methodContents in methods
+	{
+		i = 1
+		
+		foreach name, _ in methodContents.returnValues
+		{
+			if name == attribute
+			{
+				/*
+				if length methodContents.returnValues > 1
+				{
+					return methodContents.method()[i]
+				}
+				else
+				{
+					return methodContents.method()
+				}
+				*/
+				return methodName
+			}
+			
+			i += 1
+		}
+	}
+}
+
 global def game:addCategory(name, contents)
 {
 	game.map[name] = contents
@@ -38,11 +94,11 @@ global def game:getCategory(name)
 
 global def game:call(category, name, ...)
 {
-	expectedReturnValues = length game.map[category][name]["Return_Values"]
+	expectedReturnValues = length game.map[category][name].returnValues
 
 	try
 	{
-		values = [game.map[category][name]["Function"](...)]
+		values = [game.map[category][name].method(...)]
 
 		if (length values != expectedReturnValues)
 		{
@@ -61,19 +117,20 @@ global def game:call(category, name, ...)
 
 global def game:getDescription(category, name)
 {
-	return game.map[category][name]["Description"]
+	return game.map[category][name].description
 } 
 
-global def game.new(f, params, ret, desc, add)
+global def game.new(f, t, params, ret, desc, add)
 {
 	record = 
-	[ 
-		Function = f,
-		Parameters = params,
-		Return_Values = ret,
-		Description = desc,
-		Additional_Information = add
-	]
+	{
+		method = f,
+		methodType = t,
+		parameters = params,
+		returnValues = ret,
+		description = desc,
+		additionalInformation = add
+	}
 
 	return record
 }
