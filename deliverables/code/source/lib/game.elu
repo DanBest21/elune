@@ -60,9 +60,9 @@ global def game:get(attribute)
 	{
 		i = 1
 		
-		foreach name, _ in methodContents.returnValues
+		foreach valueName, _ in methodContents.returnValues
 		{
-			if name == attribute
+			if valueName == attribute
 			{
 				/*
 				if length methodContents.returnValues > 1
@@ -78,6 +78,40 @@ global def game:get(attribute)
 			}
 			
 			i += 1
+		}
+	}
+}
+
+global def game:set(attribute, value)
+{
+	methods = game:getRecordsOnType(game.methodType.SET)
+	
+	foreach methodName, methodContents in methods
+	{
+		foreach valueName, _ in methodContents.returnValues
+		{
+			if valueName == attribute
+			{
+				// return methodContents.method(value)
+				return methodName
+			}
+		}
+	}
+}
+
+global def game:check(attribute)
+{
+	methods = game:getRecordsOnType(game.methodType.CHECK)
+	
+	foreach methodName, methodContents in methods
+	{
+		foreach valueName, _ in methodContents.returnValues
+		{
+			if valueName == attribute
+			{
+				// return methodContents.method()
+				return methodName
+			}
 		}
 	}
 }
