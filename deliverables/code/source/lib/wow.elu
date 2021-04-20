@@ -1,29 +1,31 @@
 import game
 
+wow = game
+
 // Custom types
-game.dataType["TEXTURE"] = length game.dataType
+wow.dataType["TEXTURE"] = size(wow.dataType)
 
 achievements = 
 {
-	GetRewardItemID = game.new(/*C_AchievementInfo.GetRewardItemID*/ null, game.methodType.GET, { achievementID = game.dataType.INT }, { rewardItemID = game.dataType.INT }, "Returns any reward item for an achievement.", null),
-	GetSupercedingAchievements = game.new(/*C_AchievementInfo.GetSupercedingAchievements*/ null, game.methodType.GET, { achievementID = game.dataType.INT }, { supercedingAchievements = game.dataType.VAR }, "Returns the next achievement in a series.", null),
-	IsValidAchievement = game.new(/*C_AchievementInfo.IsValidAchievement*/ null, game.methodType.CHECK, { achievementID = game.dataType.INT }, { isValidAchievement = game.dataType.BOOLEAN }, "Needs summary.", null),
-	GetNextAchievement = game.new(GetNextAchievement, game.methodType.GET, { achievementID = game.dataType.INT }, { nextAchievementID = game.dataType.INT }, "Return the next achievement in a chain.", null),
-	IsTrackedAchievement = game.new(IsTrackedAchievement, game.methodType.CHECK, { achievementID = game.dataType.INT }, { eligible = game.dataType.BOOLEAN }, "Returns if an achievement is currently being tracked.", null),
-	IsAchievementEligible = game.new(IsAchievementEligible, game.methodType.CHECK, { achievementID = game.dataType.INT }, { eligible = game.dataType.BOOLEAN }, "Indicates whether the specified achievement is eligible to be completed.", null),
-	SetAchievementSearchString = game.new(SetAchievementSearchString, game.methodType.SET, { searchText = game.dataType.STRING }, { searchFinished = game.dataType.BOOLEAN }, "Starts a search for achievements containing the specified text.", null)
+	GetRewardItemID = wow.new(/*C_AchievementInfo.GetRewardItemID*/ append, wow.methodType.GET, { achievementID = wow.dataType.INT }, { rewardItemID = wow.dataType.INT }, "Returns any reward item for an achievement.", null),
+	GetSupercedingAchievements = wow.new(/*C_AchievementInfo.GetSupercedingAchievements*/ null, wow.methodType.GET, { achievementID = wow.dataType.INT }, { supercedingAchievements = wow.dataType.VAR }, "Returns the next achievement in a series.", null),
+	IsValidAchievement = wow.new(/*C_AchievementInfo.IsValidAchievement*/ null, wow.methodType.CHECK, { achievementID = wow.dataType.INT }, { isValidAchievement = wow.dataType.BOOLEAN }, "Needs summary.", null),
+	GetNextAchievement = wow.new(GetNextAchievement, wow.methodType.GET, { achievementID = wow.dataType.INT }, { nextAchievementID = wow.dataType.INT }, "Return the next achievement in a chain.", null),
+	IsTrackedAchievement = wow.new(IsTrackedAchievement, wow.methodType.CHECK, { achievementID = wow.dataType.INT }, { eligible = wow.dataType.BOOLEAN }, "Returns if an achievement is currently being tracked.", null),
+	IsAchievementEligible = wow.new(IsAchievementEligible, wow.methodType.CHECK, { achievementID = wow.dataType.INT }, { eligible = wow.dataType.BOOLEAN }, "Indicates whether the specified achievement is eligible to be completed.", null),
+	SetAchievementSearchString = wow.new(SetAchievementSearchString, wow.methodType.SET, { searchText = wow.dataType.STRING }, { searchFinished = wow.dataType.BOOLEAN }, "Starts a search for achievements containing the specified text.", null)
 }
 
-game:addCategory("achievements", achievements)
+wow:addCategory("achievements", achievements)
 
 calendar = 
 {
-	CanAddEvent = game.new(/*C_Calendar.CanAddEvent*/ null, game.methodType.CHECK, {}, { canAddEvent = game.dataType.BOOLEAN }, "Returns whether the player can add an event.", null),
-	EventDecline = game.new(/*C_Calendar.EventDecline*/ null, game.methodType.UI, {}, {}, "Declines the invitation to the currently open event.", null),
-	OpenCalendar = game.new(/*C_Calendar.OpenCalendar*/ null, game.methodType.UI, {}, {}, "Requests calendar information from the server. Does not open the calendar frame.", "Fires CALENDAR_UPDATE_EVENT_LIST, when your query has finished processing on the server and new calendar information is available. If called during the loading process, (even at PLAYER_ENTERING_WORLD) the query will not return."),
-	OpenEvent = game.new(/*C_Calendar.OpenEvent*/ null, game.methodType.UI, { offsetMonths = game.dataType.INT, monthDay = game.dataType.INT, index = game.dataType.INT }, { success = game.dataType.BOOLEAN }, "Establishes an event for future calendar API calls", null)
+	CanAddEvent = wow.new(/*C_Calendar.CanAddEvent*/ null, wow.methodType.CHECK, {}, { canAddEvent = wow.dataType.BOOLEAN }, "Returns whether the player can add an event.", null),
+	EventDecline = wow.new(/*C_Calendar.EventDecline*/ null, wow.methodType.UI, {}, {}, "Declines the invitation to the currently open event.", null),
+	OpenCalendar = wow.new(/*C_Calendar.OpenCalendar*/ null, wow.methodType.UI, {}, {}, "Requests calendar information from the server. Does not open the calendar frame.", "Fires CALENDAR_UPDATE_EVENT_LIST, when your query has finished processing on the server and new calendar information is available. If called during the loading process, (even at PLAYER_ENTERING_WORLD) the query will not return."),
+	OpenEvent = wow.new(/*C_Calendar.OpenEvent*/ null, wow.methodType.UI, { offsetMonths = wow.dataType.INT, monthDay = wow.dataType.INT, index = wow.dataType.INT }, { success = wow.dataType.BOOLEAN }, "Establishes an event for future calendar API calls", null)
 }
 
-game:addCategory("calendar", calendar)
+wow:addCategory("calendar", calendar)
 
-return game
+return wow

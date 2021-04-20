@@ -174,3 +174,15 @@ global def printList(xs)
 		print x
 	}
 }
+
+global def size(xs)
+{
+	i = 0
+	
+	foreach k, x in xs
+	{
+		i += 1
+	}
+	
+	return i
+}

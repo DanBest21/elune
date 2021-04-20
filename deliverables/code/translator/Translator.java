@@ -31,7 +31,8 @@ public class Translator
 
         EluneParser parser = new EluneParser(tokens);
 
-        EluneTranslator translator = new EluneTranslator(false, importStdLibrary);
+        EluneTranslator translator = new EluneTranslator(FilenameUtils.removeExtension(path.getFileName().toString()),
+                false, importStdLibrary);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(translator, parser.root());
 
@@ -49,13 +50,15 @@ public class Translator
         private final List<ParserRuleContext> insideTriggers = new ArrayList<>();
         private final boolean innerTranslator;
         private final boolean importStdLibrary;
+        private final String moduleName;
 
         private final EluneExprTranslator exprTranslator = new EluneExprTranslator(this);
 
-        public EluneTranslator(boolean innerTranslator, boolean importStdLibrary)
+        public EluneTranslator(String moduleName, boolean innerTranslator, boolean importStdLibrary)
         {
             this.innerTranslator = innerTranslator;
             this.importStdLibrary = importStdLibrary;
+            this.moduleName = moduleName;
         }
 
         public EluneTranslator(EluneTranslator outerTranslator)
@@ -63,6 +66,7 @@ public class Translator
             this.innerTranslator = true;
             this.importStdLibrary = false;
 
+            moduleName = outerTranslator.moduleName;
             globalScope.addAll(outerTranslator.getGlobalScope());
             currentBlock.blockScope.addAll(Objects.requireNonNull(outerTranslator.getLocalScope()));
             currentBlock.params.addAll(outerTranslator.getFunctionParams());
@@ -1152,6 +1156,12 @@ public class Translator
             if (!insideTriggers.isEmpty())
                 return;
 
+            if (moduleName.equals(ctx.NAME().getText().toLowerCase(Locale.ROOT)))
+            {
+                System.err.println("Import error: Module '" + moduleName + "' cannot import itself.");
+                System.exit(1);
+            }
+
             EluneTranslator translation = generateFile("./source/lib/" + ctx.NAME().getText().toLowerCase(Locale.ROOT) + ".elu");
 
             Map<String, Object> map = new HashMap<>();
@@ -1921,6 +1931,12 @@ public class Translator
 
             EluneExpression comparisonExpression = (EluneExpression)comparsion;
             return comparisonExpression.expression.equals(this.expression);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return expression.hashCode();
         }
     }
 

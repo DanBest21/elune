@@ -329,3 +329,29 @@ if itis == day.WEDNESDAY
 {
 	print "It is Wednesday my dude."
 }
+
+xs = [2, 2]
+acc = foldl(lambda x y { return x ^ y }, 6, xs)
+print acc
+
+printList(maths.range(5))
+
+print wow:getDescription("calendar", "EventDecline")
+
+foreach category in wow:getCategories()
+{
+	print category
+}
+
+print "Methods of type GET:"
+
+foreach name, _ in wow:getRecordsOnType(wow.methodType.GET)
+{
+	print name
+}
+
+print wow:get("nextAchievementID")
+printList(maths.range(2, 5))
+printList(maths.range(2, 11, 2))
+
+printList(maths.range(10, 1, -2))

@@ -1,23 +1,4 @@
-/*
 import wow
 
-print wow:getDescription("calendar", "EventDecline")
-
-foreach category in wow:getCategories()
-{
-	print category
-}
-
-print "Methods of type GET:"
-
-foreach name, _ in wow:getRecordsOnType(wow.methodType.GET)
-{
-	print name
-}
-
-print wow:get("nextAchievementID")
-*/
-
-import maths
-
-printList(maths.range(10, 1, -2))
+xs = wow:call("achievements", "GetRewardItemID", 6, [1, 2, 3, 4, 5])[0]
+printList(xs)

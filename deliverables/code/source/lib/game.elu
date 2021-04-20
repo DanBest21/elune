@@ -128,26 +128,22 @@ global def game:getCategory(name)
 
 global def game:call(category, name, ...)
 {
-	args = [...]
-	expectedReturnValues = length game.map[category][name].returnValues
+	expectedReturnValues = size(game.map[category][name].returnValues)
+	values = [game.map[category][name].method(...)]
 
 	try
 	{
-		values = [game.map[category][name].method(args)]
-
 		if (length values != expectedReturnValues)
 		{
 			throw DispatcherException
-		}
-		else
-		{
-			return values
 		}
 	}
 	catch DispatcherException
 	{
 		print "DispatcherException: Function '" ++ name ++ "' returned " ++ length values ++ " values, but expected " ++ expectedReturnValues ++ "."
 	}
+	
+	return values
 }
 
 global def game:getDescription(category, name)
