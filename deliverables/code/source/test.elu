@@ -20,5 +20,4 @@ print wow:get("nextAchievementID")
 
 import maths
 
-minValue = maths.min(1, 2, 3, 0, 5)
-print minValue
+printList(maths.range(10, 1, -2))

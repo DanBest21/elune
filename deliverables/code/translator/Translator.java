@@ -843,7 +843,7 @@ public class Translator
                 EluneTranslator translator = new EluneTranslator(this);
 
                 ParseTreeWalker walker = new ParseTreeWalker();
-                walker.walk(translator, ctx.block(i));
+                walker.walk(translator, ctx.block(i - 1));
 
                 map.put("action", translator.render());
 
@@ -859,12 +859,12 @@ public class Translator
             map.put("var", varExpression);
             map.put("cases", switchCases);
 
-            if (ctx.block().size() > ctx.exp().size())
+            if (ctx.block().size() > ctx.exp().size() - 1)
             {
                 EluneTranslator translator = new EluneTranslator(this);
 
                 ParseTreeWalker walker = new ParseTreeWalker();
-                walker.walk(translator, ctx.block(ctx.exp().size()));
+                walker.walk(translator, ctx.block(ctx.exp().size() - 1));
 
                 switchCount = translator.switchCount;
                 loopCount = translator.loopCount;
@@ -1781,14 +1781,14 @@ public class Translator
             map.put("symbol", ctx.operatorMulDivMod().getText());
 
             EluneExpression expressionX = this.visit(ctx.exp(0));
-            if (map.get("symbol") == "//")
+            if (map.get("symbol").toString().equals("//"))
                 translator.checkType(expressionX.toString(), expressionX.type, EluneType.INT);
             else
                 translator.checkType(expressionX.toString(), expressionX.type, Arrays.asList(EluneType.INT, EluneType.FLOAT));
             map.put("x", expressionX);
 
             EluneExpression expressionY = this.visit(ctx.exp(1));
-            if (map.get("symbol") == "//")
+            if (map.get("symbol").toString().equals("//"))
                 translator.checkType(expressionY.toString(), expressionY.type, EluneType.INT);
             else
                 translator.checkType(expressionY.toString(), expressionY.type, Arrays.asList(EluneType.INT, EluneType.FLOAT));
@@ -1808,7 +1808,7 @@ public class Translator
 
             List<EluneType> acceptedTypes;
 
-            if (map.get("symbol") == "-")
+            if (map.get("symbol").toString().equals("-"))
                 acceptedTypes = Arrays.asList(EluneType.INT, EluneType.FLOAT);
             else
                 acceptedTypes = Arrays.asList(EluneType.BOOLEAN, EluneType.NULL);

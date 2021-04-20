@@ -2,9 +2,10 @@ maths = {}
 
 global def maths.min(...)
 {
-	minValue = arg[0]
+	args = [...]
+	minValue = args[0]
 	
-	foreach x in arg
+	foreach x in args
 	{
 		if x < minValue { minValue = x }
 	}
@@ -14,9 +15,10 @@ global def maths.min(...)
 
 global def maths.max(...)
 {
-	maxValue = arg[0]
+	args = [...]
+	maxValue = args[0]
 	
-	foreach x in arg
+	foreach x in args
 	{
 		if x > maxValue { maxValue = x }
 	}
@@ -26,55 +28,54 @@ global def maths.max(...)
 
 global def maths.range(...)
 {
+	args = [...]
 	xs = []
-	argCount = 0
-	
-	foreach x in arg
-	{
-		argCount += 1
-	}
-	
+
 	try
 	{
-		switch (argCount)
+		switch (length args)
 		{
 			case 3
 			{
-				if (arg[1] > arg[0])
+				j = 0
+				
+				if (args[1] > args[0])
 				{
-					for i = 0, i < arg[1] - arg[0], i += arg[2]
+					for i = 0, j < args[1] - args[0], i += 1
 					{
-						xs[i] = arg[0] + i
+						xs[i] = args[0] + j
+						j += args[2]
 					}
 				}
 				else
 				{
-					for i = 0, i < arg[0] - arg[1], i += arg[2]
+					for i = 0, j > args[1] - args[0], i += 1
 					{
-						xs[i] = arg[0] - i
+						xs[i] = args[0] + j
+						j += args[2]
 					}
 				}
 			}
 			case 2
 			{
-				if (arg[1] > arg[0])
+				if (args[1] > args[0])
 				{
-					for i = 0, i < arg[1] - arg[0], i += 1
+					for i = 0, i < args[1] - args[0], i += 1
 					{
-						xs[i] = arg[0] + i
+						xs[i] = args[0] + i
 					}
 				}
 				else
 				{
-					for i = 0, i < arg[0] - arg[1], i += 1
+					for i = 0, i < args[0] - args[1], i += 1
 					{
-						xs[i] = arg[0] - i
+						xs[i] = args[0] - i
 					}
 				}
 			}
 			case 1
 			{
-				for i = 0, i < arg[0], i += 1
+				for i = 0, i < args[0], i += 1
 				{
 					xs[i] = i
 				}
@@ -87,7 +88,7 @@ global def maths.range(...)
 	}
 	catch InvalidArityException
 	{
-		print "InvalidArityException: Expected 1 to 3 arguments, but found " ++ length arg ++ " arguments."
+		print "InvalidArityException: Expected 1 to 3 arguments, but found " ++ length args ++ " arguments."
 	}
 	
 	return xs

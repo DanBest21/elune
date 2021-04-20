@@ -128,11 +128,12 @@ global def game:getCategory(name)
 
 global def game:call(category, name, ...)
 {
+	args = [...]
 	expectedReturnValues = length game.map[category][name].returnValues
 
 	try
 	{
-		values = [game.map[category][name].method(...)]
+		values = [game.map[category][name].method(args)]
 
 		if (length values != expectedReturnValues)
 		{
