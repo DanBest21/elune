@@ -1,8 +1,8 @@
-math = []
+maths = {}
 
-global def math.min(...)
+global def maths.min(...)
 {
-	minValue = arg[1]
+	minValue = arg[0]
 	
 	foreach x in arg
 	{
@@ -12,9 +12,9 @@ global def math.min(...)
 	return minValue
 }
 
-global def math.max(...)
+global def maths.max(...)
 {
-	maxValue = arg[1]
+	maxValue = arg[0]
 	
 	foreach x in arg
 	{
@@ -24,64 +24,133 @@ global def math.max(...)
 	return maxValue
 }
 
-global def math.add(x, y)
+global def maths.range(...)
+{
+	xs = []
+	argCount = 0
+	
+	foreach x in arg
+	{
+		argCount += 1
+	}
+	
+	try
+	{
+		switch (argCount)
+		{
+			case 3
+			{
+				if (arg[1] > arg[0])
+				{
+					for i = 0, i < arg[1] - arg[0], i += arg[2]
+					{
+						xs[i] = arg[0] + i
+					}
+				}
+				else
+				{
+					for i = 0, i < arg[0] - arg[1], i += arg[2]
+					{
+						xs[i] = arg[0] - i
+					}
+				}
+			}
+			case 2
+			{
+				if (arg[1] > arg[0])
+				{
+					for i = 0, i < arg[1] - arg[0], i += 1
+					{
+						xs[i] = arg[0] + i
+					}
+				}
+				else
+				{
+					for i = 0, i < arg[0] - arg[1], i += 1
+					{
+						xs[i] = arg[0] - i
+					}
+				}
+			}
+			case 1
+			{
+				for i = 0, i < arg[0], i += 1
+				{
+					xs[i] = i
+				}
+			}
+			default
+			{
+				throw InvalidArityException
+			}
+		}
+	}
+	catch InvalidArityException
+	{
+		print "InvalidArityException: Expected 1 to 3 arguments, but found " ++ length arg ++ " arguments."
+	}
+	
+	return xs
+}
+
+global def maths.add(x, y)
 {
 	return x + y
 }
 
-global def math.sub(x, y)
+global def maths.sub(x, y)
 {
 	return x - y
 }
 
-global def math.multiply(x, y)
+global def maths.multiply(x, y)
 {
 	return x * y
 }
 
-global def math.divide(x, y)
+global def maths.divide(x, y)
 {
 	return x / y
 }
 
-global def math.pow(x, y)
+global def maths.pow(x, y)
 {
 	return x ^ y
 }
 
-global def math.root(x, y)
+global def maths.root(x, y)
 {
 	return x ^ (1 / y)
 }
 
-global def math.modulo(x, y)
+global def maths.modulo(x, y)
 {
 	return x % y
 }
 
-global def math.sqrt(x)
+global def maths.sqrt(x)
 {
-	return math.root(x, 2)
+	return maths.root(x, 2)
 }
 
-global def math.sum(xs)
+global def maths.sum(xs)
 {
-	return foldl(math.add, 0, xs)
+	return foldl(maths.add, 0, xs)
 }
 
-global def math.product(xs)
+global def maths.product(xs)
 {
-	return foldl(math.multiply, 1, xs)
+	return foldl(maths.multiply, 1, xs)
 }
 
-global def math.isEven(x)
+global def maths.isEven(x)
 {
 	return x % 2 == 0
 }
 
-global def math.isOdd(x)
+global def maths.isOdd(x)
 {
 	return x % 2 != 0
 }
 
-return math
+return maths

@@ -6,5 +6,6 @@ public enum EluneType
     NULL,
     STRING,
     FUNCTION,
-    VAR
+    ARRAY,
+    OBJECT
 }

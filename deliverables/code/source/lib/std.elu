@@ -1,6 +1,6 @@
 global def append(x, xs)
 {
-	xs[length xs + 1] = x
+	xs[length xs] = x
 	return xs
 }
 
@@ -8,16 +8,17 @@ global def insert(x, xs, pos)
 {
 	ys = []
 	
-	for i = 0, i < pos, i += 1
+	for i = 0, i <= pos, i += 1
 	{
 		ys[i] = xs[i]
 	}
 	
-	ys[pos] = x
+	// Force the type checker to realise pos is an int.
+	ys[pos + 0] = x
 	
-	for i = pos, i <= length xs, i += 1
+	for i = pos, i < length xs, i += 1
 	{
-		ys[i] = xs[i - 1]
+		ys[i + 1] = xs[i]
 	}
 	
 	return ys
@@ -25,14 +26,14 @@ global def insert(x, xs, pos)
 
 global def head(xs)
 {
-	return xs[1]
+	return xs[0]
 }
 
 global def tail(xs)
 {
 	ys = []
 	
-	for i = 0, i < length xs, i += 1
+	for i = 0, i < length xs - 1, i += 1
 	{
 		ys[i] = xs[i + 1] 
 	}
@@ -42,7 +43,7 @@ global def tail(xs)
 
 global def last(xs)
 {
-	return xs[length xs]
+	return xs[length xs - 1]
 }
 
 global def init(xs)
@@ -61,7 +62,7 @@ global def merge(xs, ys)
 {
 	ms = []
 	
-	i = 1
+	i = 0
 	
 	foreach x in xs
 	{
@@ -78,22 +79,47 @@ global def merge(xs, ys)
 	return ms
 }
 
-global def split(s, e, xs)
+global def slice(s, e, xs)
 {
 	if s == null { s = 0 }
-	if e == null { e = length xs - 1 }
-	if e < 0 { e = length xs - 1 - e }
+	if e == null { e = length xs }
+	if e < 0 { e = length xs - e }
 	
 	ys = []
-	j = 1
+	j = 0
 	
-	for i = s - 1, i < e, i += 1
+	for i = s, i <= e, i += 1
 	{
 		ys[j] = xs[i]
 		j += 1
 	}
 	
 	return ys
+}
+
+global def intersperse(xs, ys)
+{
+	ms = []
+	i = 0
+	
+	while length xs > 0 or length ys > 0
+	{
+		if length xs > 0
+		{
+			ms[i] = head(xs)
+			xs = tail(xs)
+			i += 1
+		}
+		
+		if length ys > 0
+		{
+			ms[i] = head(ys)
+			ys = tail(ys)
+			i += 1
+		}
+	}
+	
+	return ms
 }
 
 global def map(f, xs)
@@ -115,8 +141,8 @@ global def filter(b, xs)
 	{
 		if b(x)
 		{
-			i += 1
 			ys[i] = x
+			i += 1
 		}
 	}
 	

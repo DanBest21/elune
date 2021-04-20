@@ -6,7 +6,7 @@ game.dataType["TEXTURE"] = length game.dataType
 achievements = 
 {
 	GetRewardItemID = game.new(/*C_AchievementInfo.GetRewardItemID*/ null, game.methodType.GET, { achievementID = game.dataType.INT }, { rewardItemID = game.dataType.INT }, "Returns any reward item for an achievement.", null),
-	GetSupercedingAchievements = game.new(/*C_AchievementInfo.GetSupercedingAchievements*/ null, game.methodType.GET, { achievementID = game.dataType.INT }, { supercedingAchievements = game.dataType[VAR] }, "Returns the next achievement in a series.", null),
+	GetSupercedingAchievements = game.new(/*C_AchievementInfo.GetSupercedingAchievements*/ null, game.methodType.GET, { achievementID = game.dataType.INT }, { supercedingAchievements = game.dataType.VAR }, "Returns the next achievement in a series.", null),
 	IsValidAchievement = game.new(/*C_AchievementInfo.IsValidAchievement*/ null, game.methodType.CHECK, { achievementID = game.dataType.INT }, { isValidAchievement = game.dataType.BOOLEAN }, "Needs summary.", null),
 	GetNextAchievement = game.new(GetNextAchievement, game.methodType.GET, { achievementID = game.dataType.INT }, { nextAchievementID = game.dataType.INT }, "Return the next achievement in a chain.", null),
 	IsTrackedAchievement = game.new(IsTrackedAchievement, game.methodType.CHECK, { achievementID = game.dataType.INT }, { eligible = game.dataType.BOOLEAN }, "Returns if an achievement is currently being tracked.", null),

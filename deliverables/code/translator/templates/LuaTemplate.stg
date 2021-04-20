@@ -32,10 +32,9 @@ doWhileEnd(cond, num) ::= <<
 until not (<cond>) >>
 while(cond) ::= << while <cond> do >>
 
-for(var, start, end, inc) ::= <<
+for(var, start, end) ::= <<
 local <var> = <start>
-while <end> do
-    <if(inc)><inc><endif> >>
+while <end> do >>
 forEnd(inc, num) ::= <<
     <inc>
     ::continue_<num>::

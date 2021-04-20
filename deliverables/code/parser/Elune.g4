@@ -68,7 +68,7 @@ stat
     | 'def' NAME funcbody                                                               #func
     | 'def' funcname funcbody                                                           #objFunc
     | attnamelist ('=' explist)?                                                        #att
-    | 'switch' var_ '{' ('case' exp '{' block '}')+ ('default' '{' block '}')? '}'      #switch
+    | 'switch' exp '{' ('case' exp '{' block '}')+ ('default' '{' block '}')? '}'       #switch
     | tryStmt catchStmt finallyStmt?                                                    #tryCatch
     | 'throw' NAME                                                                      #exception
     | assignexp                                                                         #assign
@@ -206,7 +206,7 @@ anondef
     ;
 
 anonlist
-    : NAME+
+    : NAME+ '...'?
     ;
 
 anonOrName

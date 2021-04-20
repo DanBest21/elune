@@ -23,7 +23,7 @@ game.methodType =
 global def game:getCategories()
 {
 	categories = []
-	i = 1
+	i = 0
 
 	foreach name, contents in game.map
 	{
@@ -58,7 +58,7 @@ global def game:get(attribute)
 	
 	foreach methodName, methodContents in methods
 	{
-		i = 1
+		i = 0
 		
 		foreach valueName, _ in methodContents.returnValues
 		{
