@@ -64,7 +64,6 @@ global def game:get(attribute)
 		{
 			if valueName == attribute
 			{
-				/*
 				if length methodContents.returnValues > 1
 				{
 					return methodContents.method()[i]
@@ -73,8 +72,6 @@ global def game:get(attribute)
 				{
 					return methodContents.method()
 				}
-				*/
-				return methodName
 			}
 			
 			i += 1
@@ -92,8 +89,7 @@ global def game:set(attribute, value)
 		{
 			if valueName == attribute
 			{
-				// return methodContents.method(value)
-				return methodName
+				return methodContents.method(value)
 			}
 		}
 	}
@@ -109,8 +105,7 @@ global def game:check(attribute)
 		{
 			if valueName == attribute
 			{
-				// return methodContents.method()
-				return methodName
+				return methodContents.method()
 			}
 		}
 	}

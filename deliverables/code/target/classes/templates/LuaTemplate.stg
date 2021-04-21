@@ -1,0 +1,81 @@
+sep() ::= << ; >>
+break() ::= << break >>
+continue(num) ::= << goto continue_<num> >>
+end() ::= << end >>
+
+label(text) ::= << ::<text>:: >>
+goto(label) ::= << goto <label> >>
+
+print(exp) ::= << print(<exp>) >>
+return(values) ::= << return <values; separator = ", "> >>
+importModule(name, assign) ::= << <if(assign)>local <name> = <endif>require "<name>" >>
+
+globalVar(names, values) ::= << <names; separator = ", "> = <values; separator = ", "> >>
+varDec(names, values) ::= << local <names; separator = ", "> = <values; separator = ", "> >>
+varAssign(names, values) ::= << <names; separator = ", "> = <values; separator = ", "> >>
+
+globalFuncDef(name, args) ::= << function <name>(<args; separator = ", ">) >>
+funcDef(name, args) ::= << local function <name>(<args; separator = ", ">) >>
+anonFuncDef(args) ::= << function (<args; separator = ", ">) >>
+
+prefixExp(name, args) ::= << <if(name)>:<name><endif><args> >>
+funcCall(name, args) ::= << <name>(<args; separator = ", ">) >>
+
+loopEnd(num) ::= <<
+    <if(num)>::continue_<num>::<endif>
+end >>
+
+do() ::= << do >>
+doWhile() ::= << repeat >>
+doWhileEnd(cond, num) ::= <<
+    <if(num)>::continue_<num>::<endif>
+until not (<cond>) >>
+while(cond) ::= << while <cond> do >>
+
+for(var, start, end) ::= <<
+local <var> = <start>
+while <end> do >>
+forEnd(inc, num) ::= <<
+    <inc>
+    <if(num)>::continue_<num>::<endif>
+end >>
+forEach(index, element, list) ::= << for <if(index)><index><else>_<endif>, <element> in <if(index)>pairs<else>ipairs<endif>(<list>) do >>
+
+if(cond) ::= << if <cond> then >>
+elseIf(cond) ::= << elseif <cond> then >>
+else() ::= << else >>
+
+switch(num, var, cases, def) ::= <<
+_switch_<num> = { <cases; separator = "\n              "> }
+_case_<num> = _switch_<num>[<var>]
+
+if _case_<num> ~= nil then
+    _case_<num>()
+<if(def)>
+else
+    <def>
+<endif>
+end
+>>
+switchCase(case, action) ::= << [<case>] = function()<action> end >>
+
+try(args, block) ::= <<
+local status, err = pcall(function(<args; separator = ", ">) <block> end)
+if not status then
+>>
+catch(exception, action) ::= <<
+if err.code == "<exception>" then
+    <action>
+end
+>>
+finally(block) ::= << <block> >>
+exception(return) ::= << error({code = "<return>"}) >>
+
+unaryOperatorExpr(y, symbol) ::= << <symbol> <y> >>
+operatorExpr(x, y, symbol) ::= << <x> <symbol> <y> >>
+compoundAssign(x, y, symbol) ::= << <x> = <x> <symbol> <y> >>
+
+len(var) ::= << #<var> >>
+
+array(elements) ::= << {<if(elements)><elements; separator = ", "><endif>} >>
+dictionary(elements) ::= << {<if(elements)><elements; separator = ", "><endif>} >>
