@@ -1,4 +1,4 @@
-game = {}
+global game = {}
 
 game.map = {}
 
@@ -165,5 +165,3 @@ global def game.new(f, t, params, ret, desc, add)
 
 	return record
 }
-
-return game

@@ -22,13 +22,13 @@ prefixExp(name, args) ::= << <if(name)>:<name><endif><args> >>
 funcCall(name, args) ::= << <name>(<args; separator = ", ">) >>
 
 loopEnd(num) ::= <<
-    ::continue_<num>::
+    <if(num)>::continue_<num>::<endif>
 end >>
 
 do() ::= << do >>
 doWhile() ::= << repeat >>
 doWhileEnd(cond, num) ::= <<
-    ::continue_<num>::
+    <if(num)>::continue_<num>::<endif>
 until not (<cond>) >>
 while(cond) ::= << while <cond> do >>
 
@@ -37,7 +37,7 @@ local <var> = <start>
 while <end> do >>
 forEnd(inc, num) ::= <<
     <inc>
-    ::continue_<num>::
+    <if(num)>::continue_<num>::<endif>
 end >>
 forEach(index, element, list) ::= << for <if(index)><index><else>_<endif>, <element> in <if(index)>pairs<else>ipairs<endif>(<list>) do >>
 
