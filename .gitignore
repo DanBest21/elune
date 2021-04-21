@@ -1,4 +1,4 @@
 /deliverables/code/.idea/
-/parser/gen/
-/source/gen/
-target/classes/
+/deliverables/code/parser/gen/
+/deliverables/code/source/gen/
+/deliverables/code/classes/
