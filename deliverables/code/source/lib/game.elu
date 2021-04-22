@@ -7,9 +7,10 @@ game.dataType =
 	NULL = 1,
 	INT = 2,
 	FLOAT = 3,
-	BOOLEAN = 4,
-	FUNCTION = 5,
-	VAR = 6
+	STRING = 4,
+	BOOLEAN = 5,
+	FUNCTION = 6,
+	VAR = 7
 }
 
 game.methodType =
@@ -17,7 +18,9 @@ game.methodType =
 	GET = 1,
 	SET = 2,
 	CHECK = 3,
-	UI = 4
+	QUERY = 4,
+	UI = 5,
+	MESSAGE = 6
 }
 
 global def game:getCategories()
@@ -64,7 +67,7 @@ global def game:get(attribute)
 		{
 			if valueName == attribute
 			{
-				if length methodContents.returnValues > 1
+				if size(methodContents.returnValues) > 1
 				{
 					return methodContents.method()[i]
 				}
@@ -95,7 +98,7 @@ global def game:set(attribute, value)
 	}
 }
 
-global def game:check(attribute)
+global def game:check(attribute, ...)
 {
 	methods = game:getRecordsOnType(game.methodType.CHECK)
 	
@@ -105,8 +108,35 @@ global def game:check(attribute)
 		{
 			if valueName == attribute
 			{
-				return methodContents.method()
+				return methodContents.method(...)
 			}
+		}
+	}
+}
+
+global def game:query(attribute, ...)
+{
+	methods = game:getRecordsOnType(game.methodType.QUERY)
+	
+	foreach methodName, methodContents in methods
+	{
+		i = 0
+		
+		foreach valueName, _ in methodContents.returnValues
+		{			
+			if valueName == attribute
+			{
+				if size(methodContents.returnValues) > 1
+				{
+					return methodContents.method(...)[i]
+				}
+				else
+				{
+					return methodContents.method(...)
+				}
+			}
+			
+			i += 1
 		}
 	}
 }
@@ -123,9 +153,10 @@ global def game:getCategory(name)
 
 global def game:call(category, name, ...)
 {
-	expectedReturnValues = size(game.map[category][name].returnValues)
-	values = [game.map[category][name].method(...)]
+	// expectedReturnValues = size(game.map[category][name].returnValues)
+	return game.map[category][name].method(...)
 
+	/*
 	try
 	{
 		if (length values != expectedReturnValues)
@@ -137,8 +168,7 @@ global def game:call(category, name, ...)
 	{
 		print "DispatcherException: Function '" ++ name ++ "' returned " ++ length values ++ " values, but expected " ++ expectedReturnValues ++ "."
 	}
-	
-	return values
+	*/
 }
 
 global def game:getDescription(category, name)

@@ -3,6 +3,7 @@ global wow = game
 // Custom types
 wow.dataType["TEXTURE"] = size(wow.dataType)
 wow.dataType["FRAME"] = size(wow.dataType)
+wow.dataType["UNIT_ID"] = size(wow.dataType)
 
 achievements = 
 {
@@ -27,6 +28,43 @@ calendar =
 
 wow:addCategory("calendar", calendar)
 
+chat =
+{
+	SendChatMessage = wow.new(SendChatMessage, wow.methodType.MESSAGE, { msg = wow.dataType.STRING, chatType = wow.dataType.STRING, languageID = wow.dataType.INT, target = wow.dataType.STRING }, {}, "Sends a chat message.", "Fires CHAT_MSG_* events, e.g. CHAT_MSG_SAY and CHAT_MSG_CHANNEL. RAID_WARNING is accessible to raid leaders, or to all members of a party (when not in a raid). WHISPER works across all realms in a region, it's not restricted to connected realms and you don't need to have interacted with the recipient before.")
+}
+
+wow:addCategory("chat", chat)
+
+combat = 
+{
+	GetCurrentEventInfo = wow.new(CombatLogGetCurrentEventInfo, wow.methodType.GET, {}, { timestamp = wow.dataType.FLOAT, subevent = wow.dataType.STRING, hideCaster = wow.dataType.BOOLEAN, sourceGUID = wow.dataType.STRING, sourceName = wow.dataType.STRING, sourceFlags = wow.dataType.INT, sourceRaidFlags = wow.dataType.INT, destGUID = wow.dataType.STRING, destName = wow.dataType.STRING, destFlags = wow.dataType.INT, destRaidFlags = wow.dataType.INT }, "Returns the current COMBAT_LOG_EVENT payload.", "In the new event system for 8.0, supporting the original functionality of the CLEU event was problematic due to the context arguments, i.e. each argument can be interpreted differently depending on the previous arguments. The payload was subsequently moved to this function.")
+}
+
+wow:addCategory("combat", combat)
+
+groups = 
+{
+	GetNumGroupMembers = wow.new(GetNumGroupMembers, wow.methodType.QUERY, { groupType = wow.dataType.INT }, { numGroupMembers = wow.dataType.INT }, "Returns the total number of players in a group.", ""),
+	IsInGroup = wow.new(IsInGroup, wow.methodType.CHECK, { groupType = wow.dataType.INT }, { inGroup = wow.dataType.BOOLEAN }, "Returns whether the player is in a [specific type of] group.", "The HOME category includes Parties and Raids. It is possible for a character to belong to a party or a raid at the same time they are in an instance group (LFR or Flex). To distinguish between a party and a raid, use the IsInRaid() function."),
+	IsInRaid = wow.new(IsInRaid, wow.methodType.CHECK, { groupType = wow.dataType.INT }, { inRaid = wow.dataType.BOOLEAN }, "Indicates whether the player is in a [specific type of] raid group.", "This returns true in arenas if groupType is LE_PARTY_CATEGORY_INSTANCE or is unspecified.")
+}
+
+wow:addCategory("groups", groups)
+
+instances =
+{
+	IsInInstance = wow.new(IsInInstance, wow.methodType.CHECK, {}, { inInstance = wow.dataType.BOOLEAN, instanceType = wow.dataType.STRING }, "Checks whether the player is in an instance and the type of instance.", "This functon returns correct results immediately upon PLAYER_ENTERING_WORLD.")
+}
+
+wow:addCategory("instances", instances)
+
+spells = 
+{
+	GetSpellLink = wow.new(GetSpellLink, wow.methodType.QUERY, { spellID = wow.dataType.INT, spellName = wow.dataType.STRING, slot = wow.dataType.INT, bookType = wow.dataType.STRING }, { spellLink = wow.dataType.STRING /*, spellID = wow.dataType.INT */ }, "Returns a hyperlink for a spell.", "")
+}
+
+wow:addCategory("spells", spells)
+
 ui =
 {
 	CreateFrame = wow.new(CreateFrame, wow.methodType.UI, { frameType = wow.dataType.STRING, name = wow.dataType.STRING, parent = wow.dataType.FRAME, template = wow.dataType.STRING, id = wow.dataType.INT }, { frame = wow.dataType.FRAME }, "Creates a new Frame object.", "Frames cannot be deleted or garbage collected, but they can be reused/recycled (There technically is a way to destroy frames by parenting them to a user waypoint frame). Fires the frame's OnLoad script, if it has one from an inherited template."),
@@ -34,3 +72,10 @@ ui =
 }
 
 wow:addCategory("ui", ui)
+
+unit = 
+{
+	UnitGUID = wow.new(UnitGUID, wow.methodType.QUERY, { unit = wow.dataType.UNIT_ID }, { unitGUID = wow.dataType.STRING }, "Returns the GUID of the specified unit.", "")
+}
+
+wow:addCategory("unit", unit)

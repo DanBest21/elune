@@ -125,7 +125,9 @@ public class Translator
         @Override
         public void enterSep(EluneParser.SepContext ctx)
         {
-            translatedCode.append(Renderer.gen("sep", null, true));
+            String seperator = Renderer.gen("sep", null, true);
+
+            translatedCode.append(translatedCode.toString().endsWith(seperator) ? "" : seperator);
 
             if (!innerTranslator)
                 translatedCode.append("\n");
@@ -1109,11 +1111,11 @@ public class Translator
                 {
                     map.put("name", ctx.nameAndArgs(i).NAME().getText());
                     String functionName = functionExpression.expression + ":" + ctx.nameAndArgs(i).NAME().getText();
-                    checkType(functionName, getType(functionName, true), EluneType.FUNCTION, true);
+                    checkType(functionName, getType(functionName, true), EluneType.FUNCTION);
                 }
                 else
                 {
-                    checkType(functionExpression.expression, functionExpression.type, EluneType.FUNCTION, true);
+                    checkType(functionExpression.expression, functionExpression.type, EluneType.FUNCTION);
                 }
 
                 if (ctx.nameAndArgs(i).args() != null)
@@ -1318,7 +1320,7 @@ public class Translator
 
         public void checkType(String value, EluneType actualType, EluneType expectedType)
         {
-            checkType(value, actualType, expectedType, false, false);
+            checkType(value, actualType, expectedType, false, true);
         }
 
         public void checkType(String value, EluneType actualType, EluneType expectedType, boolean allowUnknown)
@@ -1877,6 +1879,9 @@ public class Translator
                 translator.checkType(expressionY.toString(), expressionY.type, Arrays.asList(EluneType.INT, EluneType.FLOAT));
             map.put("y", expressionY);
 
+            if (map.get("symbol").toString().equals("//"))
+                map.put("symbol", "/");
+
             return new EluneExpression(Renderer.gen("operatorExpr", map, true),
                     (expressionX.type == EluneType.FLOAT || expressionY.type == EluneType.FLOAT) ?
                             EluneType.FLOAT : EluneType.INT);
@@ -1972,6 +1977,9 @@ public class Translator
             else
                 translator.checkType(expressionY.toString(), expressionY.type, Arrays.asList(EluneType.INT, EluneType.FLOAT));
             map.put("y", expressionY);
+
+            if (map.get("symbol").toString().equals("//"))
+                map.put("symbol", "/");
 
             return new EluneExpression(Renderer.gen("compoundAssign", map, true),
                     expressionX.type == EluneType.FLOAT || expressionY.type == EluneType.FLOAT

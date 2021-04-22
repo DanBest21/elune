@@ -1,7 +1,3 @@
-UnitGUID = UnitGUID
-GetNumRaidMembers = GetNumRaidMembers
-GetNumPartyMembers = GetNumPartyMembers
-IsInInstance = IsInInstance
 InstanceType = "none"
 RaidIconMaskToIndex =
 {
@@ -11,14 +7,14 @@ RaidIconMaskToIndex =
 	COMBATLOG_OBJECT_RAIDTARGET4 = 4,
 	COMBATLOG_OBJECT_RAIDTARGET5 = 5,
 	COMBATLOG_OBJECT_RAIDTARGET6 = 6,
-	COMBATLOG_OBJECT_RAIDTARGET7 = 7,
+	COMBATLOG_OBJECT_RAIDTARGET7 = 7, 
 	COMBATLOG_OBJECT_RAIDTARGET8 = 8
 }
 
 def GetRaidIcon(unitFlags)
 {
 	// Check for an appropriate icon for this unit
-	raidTarget = bit.band(unitFlags, COMBATLOG_OBJECT_RAIDTARGET_MASK);
+	raidTarget = bit.band(unitFlags, COMBATLOG_OBJECT_RAIDTARGET_MASK)
 	if (raidTarget == 0)
 	{
 		return "";
@@ -27,49 +23,54 @@ def GetRaidIcon(unitFlags)
 	return "{rt" ++ RaidIconMaskToIndex[raidTarget] ++ "}"
 }
 
-interr = CreateFrame("Frame", "InterruptTrackerFrame", UIParent)
+interr = wow:call("ui", "CreateFrame", "Frame", "InterruptTrackerFrame", UIParent)
 interr:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 interr:RegisterEvent("PLAYER_ENTERING_WORLD")
 interr:SetScript("OnEvent", lambda self event ... 
 {
     if (event == "COMBAT_LOG_EVENT_UNFILTERED")
-	{
-        type, _, sourceGUID, sourceName, _, _, destGUID, destName, _, destRaidFlags, spellId = select(2, CombatLogGetCurrentEventInfo());
-        if (type == "SPELL_INTERRUPT" and UnitGUID("player") == sourceGUID)
+	{				
+        type, _, sourceGUID, sourceName, _, _, destGUID, destName, _, destRaidFlags, spellId = select(2, wow:call("combat", "GetCurrentEventInfo"))
+		
+        if (type == "SPELL_INTERRUPT" and wow:query("unitGUID", "player") == sourceGUID)
 		{
-            extraSpellID = select(15, CombatLogGetCurrentEventInfo())
+            extraSpellID = select(15, wow:call("combat", "GetCurrentEventInfo"))
             destIcon = ""
+			
             if destName
 			{
                 destIcon = GetRaidIcon(destRaidFlags)
             }
 
-            interruptingSpell = GetSpellLink(spellId)
-            interruptedSpell = GetSpellLink(extraSpellID)
+            interruptingSpell = wow:query("spellLink", spellId)
+            interruptedSpell = wow:query("spellLink", extraSpellID)
             msg = ""
-            if IsInGroup()
+			
+            if wow:check("inGroup")
 			{
-                msg = interruptingSpell ++ " interrupted " ++ destIcon ++ destName ++ "'s " ++ interruptedSpell ++ "!"
+				msg = interruptingSpell ++ " interrupted " ++ destIcon ++ destName ++ "'s " ++ interruptedSpell ++ "!"
             }
+			
 			else
 			{
                 destStr = format(TEXT_MODE_A_STRING_SOURCE_UNIT, "", destGUID, destName, destName) // empty icon, destRaidFlags = 0 when solo
                 msg = "\124cffff4809" ++ sourceName ++ ": \124r" ++ interruptingSpell ++ " \124cffff4809interrupted " ++ destStr ++ "'s\124r " ++ interruptedSpell ++ "\124cffff4809!\124r"
             }
 
-            if GetNumGroupMembers() > 0
+            if wow:query("numGroupMembers") > 0
 			{
-                msgType = "PARTY";
-                if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) or IsInRaid(LE_PARTY_CATEGORY_INSTANCE)) and (InstanceType == "party" or InstanceType == "raid" or InstanceType == "pvp" or InstanceType == "scenario") // Dungeon/Raid Finder/Battleground
+                msgType = "PARTY"
+				
+                if (wow:check("inGroup", LE_PARTY_CATEGORY_INSTANCE) or wow:check("inRaid", LE_PARTY_CATEGORY_INSTANCE)) and (InstanceType == "party" or InstanceType == "raid" or InstanceType == "pvp" or InstanceType == "scenario") // Dungeon/Raid Finder/Battleground
 				{
                     msgType = "INSTANCE_CHAT"
 				}
-                elseif IsInRaid(LE_PARTY_CATEGORY_HOME)
+                elseif wow:check("inRaid", LE_PARTY_CATEGORY_HOME)
 				{
                     msgType = "RAID"
                 }
 
-                SendChatMessage(msg, msgType) // should NEVER happen
+                wow:call("chat", "SendChatMessage", msg, msgType) // should NEVER happen
 			}
             else
 			{
@@ -79,7 +80,7 @@ interr:SetScript("OnEvent", lambda self event ...
     }
 	elseif event == "PLAYER_ENTERING_WORLD"
 	{
-        _, iType = IsInInstance()
+        _, iType = wow:call("instances", "IsInInstance")
         InstanceType = iType
     }
 })
