@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dd000b25-2e59-4286-be88-d8836e33064f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/code.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/code.iml" afterDir="false" />
+    <list default="true" id="2dc25c1f-797e-4fa3-8481-4fa2eca8a16a" name="Default Changelist" comment="Fixed yet more errors and have got the API dispatcher set up for modding development.">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_ST4_4_3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_antlr_runtime_3_5_2.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translator/Translator.java" beforeDir="false" afterPath="$PROJECT_DIR$/translator/Translator.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +46,7 @@
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/source/EluneInterruptAnnouncer.elu" />
@@ -55,8 +57,9 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="project.structure.last.edited" value="Libraries" />
-    <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="project.structure.proportion" value="0.3254717" />
+    <property name="project.structure.side.proportion" value="0.3854489" />
+    <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.repository.indices" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -65,22 +68,11 @@
   </component>
   <component name="RunManager">
     <configuration name="Translator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="11" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="Translator" />
-      <module name="code" />
+      <module name="translator" />
       <option name="PROGRAM_PARAMETERS" value="./source/EluneInterruptAnnouncer.elu lua off off" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -94,7 +86,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="dd000b25-2e59-4286-be88-d8836e33064f" name="Default Changelist" comment="" />
+      <changelist id="2dc25c1f-797e-4fa3-8481-4fa2eca8a16a" name="Default Changelist" comment="Fixed yet more errors and have got the API dispatcher set up for modding development." />
       <created>1617120313845</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -108,6 +100,12 @@
       <workItem from="1618966574562" duration="1133000" />
       <workItem from="1618968602757" duration="4471000" />
       <workItem from="1619023344763" duration="4366000" />
+      <workItem from="1619042638009" duration="276000" />
+      <workItem from="1619042949587" duration="1469000" />
+      <workItem from="1619044501606" duration="3000" />
+      <workItem from="1619044535764" duration="210000" />
+      <workItem from="1619044780164" duration="202000" />
+      <workItem from="1619045014932" duration="1791000" />
     </task>
     <task id="LOCAL-00001" summary="Began work on the translator.">
       <created>1617255252555</created>
@@ -171,6 +169,18 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Began work on the translator." />
     <MESSAGE value="Fixed some warnings in the translator." />
@@ -187,7 +197,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/translator/Translator.java</url>
-          <line>306</line>
+          <line>381</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
@@ -199,7 +209,7 @@
     </pin-to-top-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="varList.get(i)" language="JAVA" />
+        <watch expression="translatedCode.toString().endsWith(&quot;;&quot;)" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>

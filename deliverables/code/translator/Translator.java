@@ -114,7 +114,7 @@ public class Translator
                 map.put("assign", false);
 
                 if (innerTranslator)
-                    translatedCode.append(" ").append(Renderer.gen("importModule", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                    translatedCode.append(" ").append(Renderer.gen("importModule", map, true)).append(";");
                 else
                     translatedCode.append(Renderer.gen("importModule", map)).append("\n");
 
@@ -135,7 +135,7 @@ public class Translator
         public void enterBreak(EluneParser.BreakContext ctx)
         {
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("break", null, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("break", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("break", null)).append("\n");
         }
@@ -148,7 +148,7 @@ public class Translator
             map.put("num", loopCount);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("continue", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("continue", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("continue", map)).append("\n");
         }
@@ -161,7 +161,7 @@ public class Translator
             map.put("text", ctx.NAME().getText());
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("label", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("label", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("label", map)).append("\n");
         }
@@ -174,7 +174,7 @@ public class Translator
             map.put("label", ctx.NAME().getText());
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("goto", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("goto", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("goto", map)).append("\n");
         }
@@ -206,7 +206,7 @@ public class Translator
             map.put("values", valueList.toArray());
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("globalVar", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("globalVar", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("globalVar", map)).append("\n");
 
@@ -285,7 +285,7 @@ public class Translator
                 templateName = "varAssign";
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen(templateName, map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen(templateName, map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen(templateName, map)).append("\n");
 
@@ -378,7 +378,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n");
         }
@@ -445,7 +445,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n");
         }
@@ -515,7 +515,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n");
         }
@@ -553,7 +553,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n\n");
         }
@@ -594,7 +594,7 @@ public class Translator
             currentBlock = currentBlock.parentBlock;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("doWhileEnd", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("doWhileEnd", map, true)).append(";");
             else
                 translatedCode.append("\t").append(Renderer.gen("doWhileEnd", map)).append("\n\n");
 
@@ -638,7 +638,7 @@ public class Translator
                 map.put("num", loopCount);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true)).append(";");
             else
                 translatedCode.append("\t").append(Renderer.gen("loopEnd", map)).append("\n\n");
 
@@ -695,7 +695,7 @@ public class Translator
             map.put("inc", incrementExpression);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("forEnd", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("forEnd", map, true)).append(";");
             else
                 translatedCode.append("\t").append(Renderer.gen("forEnd", map)).append("\n\n");
 
@@ -761,7 +761,7 @@ public class Translator
                 map.put("num", loopCount);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("loopEnd", map, true)).append(";");
             else
                 translatedCode.append("\t").append(Renderer.gen("loopEnd", map)).append("\n\n");
 
@@ -869,7 +869,7 @@ public class Translator
                 return;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n\n");
         }
@@ -932,7 +932,7 @@ public class Translator
             }
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("switch", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("switch", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("switch", map)).append("\n\n");
         }
@@ -1042,7 +1042,7 @@ public class Translator
             map.put("block", translator.render());
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append("\n").append(Renderer.gen("finally", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("end", null, true)).append("\n").append(Renderer.gen("finally", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("end", null)).append("\n").append(Renderer.gen("finally", map)).append("\n");
         }
@@ -1062,9 +1062,9 @@ public class Translator
             if (innerTranslator)
             {
                 if (ctx.finallyStmt() == null)
-                    translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                    translatedCode.append(" ").append(Renderer.gen("end", null, true)).append(";");
                 else
-                    translatedCode.append(translatedCode.toString().endsWith(";") ? "" : ";");
+                    translatedCode.append(";");
             }
             else
             {
@@ -1086,7 +1086,7 @@ public class Translator
             map.put("return", ctx.NAME().getText());
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("exception", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("exception", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("exception", map)).append("\n");
         }
@@ -1123,7 +1123,7 @@ public class Translator
             }
 
             if (innerTranslator)
-                translatedCode.append(" ").append(functionCall).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(functionCall).append(";");
             else
                 translatedCode.append(Renderer.getTab()).append(functionCall).append("\n");
         }
@@ -1135,7 +1135,7 @@ public class Translator
                 return;
 
             if (innerTranslator)
-                translatedCode.append(" ").append(exprTranslator.visit(ctx)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(exprTranslator.visit(ctx)).append(";");
             else
                 translatedCode.append(Renderer.getTab()).append(exprTranslator.visit(ctx)).append("\n");
         }
@@ -1153,7 +1153,7 @@ public class Translator
             map.put("exp", printExpression);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("print", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("print", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("print", map)).append("\n");
         }
@@ -1171,7 +1171,7 @@ public class Translator
             map.put("exp", printExpression);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("print", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("print", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("print", map)).append("\n");
         }
@@ -1196,7 +1196,7 @@ public class Translator
             map.put("values", values);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("return", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("return", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("return", map)).append("\n");
         }
@@ -1227,7 +1227,7 @@ public class Translator
             map.put("assign", true);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("importModule", map, true)).append(translatedCode.toString().endsWith(";") ? "" : ";");
+                translatedCode.append(" ").append(Renderer.gen("importModule", map, true)).append(";");
             else
                 translatedCode.append(Renderer.gen("importModule", map)).append("\n");
 
