@@ -1,0 +1,50 @@
+global civ = game
+
+// Custom types
+civ.dataType["PLAYER"] = size(civ.dataType)
+civ.dataType["CULTURE"] = size(civ.dataType)
+
+culture =
+{
+	GetCulture = {lambda player { return player:GetCulture() }, civ.methodType.QUERY, { player = civ.dataType.PLAYER }, { culture = civ.dataType.CULTURE }, "Retrieves the culture object that is connected to the PLAYER object it is called upon.", ""},
+	GetTouristsFromTooltip = {lambda culture otherPlayerID { return culture:GetTouristsFromTooltip(otherPlayerID) }, civ.methodType.QUERY, { culture = civ.dataType.CULTURE, otherPlayerID = civ.dataType.INT }, { touristToolTipInfo = civ.dataType.STRING }, "Returns a string containing the tooltip information regarding the tourists associated with the passed player ID.", ""}
+}
+
+civ:addCategory("culture", culture)
+
+diplomacy =
+{
+	HasMet = {lambda player otherPlayerID { return player:GetDiplomacy():HasMet(otherPlayerID) }, civ.methodType.QUERY, { player = civ.dataType.PLAYER, otherPlayerID = civ.dataType.INT }, { hasMet = civ.dataType.BOOLEAN }, "Returns a boolean which indicates if the player has met the player associated with the passed ID number.", ""}
+}
+
+civ:addCategory("diplomacy", diplomacy)
+
+events = 
+{
+	Add = {lambda event callbackMethod { return event:Add(callbackMethod) }, civ.methodType.SET, { event = civ.dataType.EVENT, callbackMethod = civ.dataType.FUNCTION }, {}, "Sets up a callback that is triggered when the event occurs.", ""},
+}
+
+civ:addCategory("events", events)
+
+manager =
+{
+	GetAliveMajorIDs = {PlayerManager.GetAliveMajorIDs, civ.methodType.GET, {}, { aliveMajorIDs = civ.dataType.VAR }, "Retrieves the IDs associated with every major civilization (player or AI) still alive in the current game session.", ""},
+	GetAliveMajorsCount = PlayerManager.GetAliveMajorsCount, civ.methodType.GET, {}. { aliveMajorsCount = civ.dataType.INT }, "Returns the number of alive major civilizations.", ""}
+}
+
+civ:addCategory("manager", manager)
+
+player =
+{
+	GetPlayer = {Players, civ.methodType.LOOKUP, { playerID = civ.dataType.INT }, { player = civ.dataType.PLAYER }, "Retrieves the PLAYER object associated with the passed ID.", ""},
+	PlayerTurnActivated = {Events.PlayerTurnActivated, civ.methodType.GET, {}, { playerTurnActivated = civ.dataType.EVENT }, "Returns an EVENT object that corresponds to when the player's turn begins.", ""}
+}
+
+civ:addCategory("player", player)
+
+treasury =
+{
+	SetGoldBalance = {lambda player goldBalance { return player:GetTreasury():ChangeGoldBalance(goldBalance) }, civ.methodType.SET, { player = civ.dataType.PLAYER, goldBalance = civ.dataType.FLOAT }, {}, "Changes the gold balance of the PLAYER object to the value passed.", ""}
+}
+
+civ:addCategory("treasury", treasury)

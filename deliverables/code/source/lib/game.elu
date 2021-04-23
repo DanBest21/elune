@@ -10,7 +10,8 @@ game.dataType =
 	STRING = 4,
 	BOOLEAN = 5,
 	FUNCTION = 6,
-	VAR = 7
+	VAR = 7,
+	EVENT = 8
 }
 
 game.methodType =
@@ -20,7 +21,8 @@ game.methodType =
 	CHECK = 3,
 	QUERY = 4,
 	UI = 5,
-	MESSAGE = 6
+	MESSAGE = 6,
+	LOOKUP = 7
 }
 
 global def game:getCategories()
@@ -59,7 +61,7 @@ global def game:get(attribute)
 {
 	methods = game:getRecordsOnType(game.methodType.GET)
 	
-	foreach methodName, methodContents in methods
+	foreach _, methodContents in methods
 	{
 		i = 0
 		
@@ -86,7 +88,7 @@ global def game:set(attribute, value)
 {
 	methods = game:getRecordsOnType(game.methodType.SET)
 	
-	foreach methodName, methodContents in methods
+	foreach _, methodContents in methods
 	{
 		foreach valueName, _ in methodContents.returnValues
 		{
@@ -102,7 +104,7 @@ global def game:check(attribute, ...)
 {
 	methods = game:getRecordsOnType(game.methodType.CHECK)
 	
-	foreach methodName, methodContents in methods
+	foreach _, methodContents in methods
 	{
 		foreach valueName, _ in methodContents.returnValues
 		{
@@ -118,7 +120,7 @@ global def game:query(attribute, ...)
 {
 	methods = game:getRecordsOnType(game.methodType.QUERY)
 	
-	foreach methodName, methodContents in methods
+	foreach _, methodContents in methods
 	{
 		i = 0
 		
@@ -137,6 +139,22 @@ global def game:query(attribute, ...)
 			}
 			
 			i += 1
+		}
+	}
+}
+
+global def game:lookup(tableName, attribute)
+{
+	tables = game:getRecordsOnType(game.methodType.LOOKUP)
+	
+	foreach _, contents in tables
+	{
+		foreach valueName, _ in methodContents.returnValues
+		{	
+			if (valueName == tableName)
+			{
+				return contents.method[attribute]
+			}
 		}
 	}
 }

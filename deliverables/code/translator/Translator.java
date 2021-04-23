@@ -2100,15 +2100,8 @@ public class Translator
     {
         targetLanguage = args[1];
 
-        boolean disableContinue = false;
-
-        if (args[2] != null && args[2].equals("off"))
-            disableContinue = true;
-
-        boolean disableImports = false;
-
-        if (args[3] != null && args[3].equals("off"))
-            disableImports = true;
+        boolean disableContinue = args[2] != null && args[2].equals("off");
+        boolean disableImports = args[3] != null && args[3].equals("off");
 
         generateFile(args[0], disableContinue, disableImports);
     }

@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2dc25c1f-797e-4fa3-8481-4fa2eca8a16a" name="Default Changelist" comment="Fixed yet more errors and have got the API dispatcher set up for modding development.">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_ST4_4_3.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_antlr_runtime_3_5_2.xml" beforeDir="false" />
+    <list default="true" id="2dc25c1f-797e-4fa3-8481-4fa2eca8a16a" name="Default Changelist" comment="Cleaned up the project.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/lib/game.elu" beforeDir="false" afterPath="$PROJECT_DIR$/source/lib/game.elu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/translator/Translator.java" beforeDir="false" afterPath="$PROJECT_DIR$/translator/Translator.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -77,6 +75,17 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Translator" />
@@ -105,7 +114,11 @@
       <workItem from="1619044501606" duration="3000" />
       <workItem from="1619044535764" duration="210000" />
       <workItem from="1619044780164" duration="202000" />
-      <workItem from="1619045014932" duration="1791000" />
+      <workItem from="1619045014932" duration="2439000" />
+      <workItem from="1619072372222" duration="644000" />
+      <workItem from="1619117483204" duration="1541000" />
+      <workItem from="1619145983561" duration="38000" />
+      <workItem from="1619146075439" duration="304000" />
     </task>
     <task id="LOCAL-00001" summary="Began work on the translator.">
       <created>1617255252555</created>
@@ -163,7 +176,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619041658741</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Cleaned up the project.">
+      <created>1619060577998</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1619060577998</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -190,14 +210,15 @@
     <MESSAGE value="Made the language work with WoW." />
     <MESSAGE value="Fixed some issues to get the language to work for WoW." />
     <MESSAGE value="Added gitignore file." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added gitignore file." />
+    <MESSAGE value="Cleaned up the project." />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaned up the project." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/translator/Translator.java</url>
-          <line>381</line>
+          <line>385</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
