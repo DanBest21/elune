@@ -4,44 +4,44 @@ if not ExposedMembers.DB_YT
 }
 
 DB_YT = ExposedMembers.DB_YT
+civ = DB_YT.game_ui
 
 def YT_GetGoldFromForeignTourists(ActivePlayerID)
 {
-	// ActivePlayer = Players[ActivePlayerID]
-	ActivePlayer = civ:lookup("GetPlayer", ActivePlayerID)
-	// ActivePlayerCulture = ActivePlayer:GetCulture()
+	ActivePlayer = civ:lookup("player", ActivePlayerID)
 	ActivePlayerCulture = civ:query("culture", ActivePlayer)
-	// OtherPlayerIDs = PlayerManager.GetAliveMajorIDs()
 	OtherPlayerIDs = civ:get("aliveMajorIDs")
 	
 	PerTurnSum = 0
 	
-	for _, LoopPlayerID in OtherPlayerIDs
+	foreach LoopPlayerID in OtherPlayerIDs
 	{
-		if ActivePlayerID != LoopPlayerID and civ:query("hasMet", ActivePlayer, LoopPlayerID) == true // ActivePlayer:GetDiplomacy():HasMet(LoopPlayerID) == true
-		{
-			// Temp = ActivePlayerCulture:GetTouristsFromTooltip(LoopPlayerID)
+		if ActivePlayerID != LoopPlayerID and civ:query("hasMet", ActivePlayer, LoopPlayerID) == true
+		{			
 			Temp = civ:query("touristTooltipInfo", ActivePlayerCulture, LoopPlayerID)
 			
 			z = 0
 			PerTurn = 0
 			Lifetime = 0
 			
-			for y in string.gmatch(Temp, '(%d+)')
+			foreach |y| in string.gmatch(Temp, '(%d+)')
 			{
-				if z == 0 then
+				if z == 0
+				{
 					PerTurn = y
+				}
 				else
+				{
 					Lifetime = y
-				end
+				}
+				
 				z = z + 1
 			}
 			
 			PerTurnSum = PerTurnSum + PerTurn
 		}
 	}
-	
-	// OtherPlayers = PlayerManager.GetAliveMajorsCount() - 1
+
 	OtherPlayers = civ:get("aliveMajorsCount") - 1
 	
 	return PerTurnSum / OtherPlayers

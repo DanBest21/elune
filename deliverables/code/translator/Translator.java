@@ -717,6 +717,11 @@ public class Translator
 
             EluneExpression listExpression = exprTranslator.visit(ctx.explist());
 
+            String templateName = "forEach";
+
+            if (ctx.getChild(1).getText().equals("|") || ctx.getChild(3).getText().equals("|"))
+                templateName = "forEachIterator";
+
             if (ctx.NAME().size() > 1)
             {
                 map.put("index", ctx.NAME(0).getText());
@@ -742,9 +747,9 @@ public class Translator
             map.put("list", listExpression);
 
             if (innerTranslator)
-                translatedCode.append(" ").append(Renderer.gen("forEach", map, true));
+                translatedCode.append(" ").append(Renderer.gen(templateName, map, true));
             else
-                translatedCode.append(Renderer.gen("forEach", map)).append("\n");
+                translatedCode.append(Renderer.gen(templateName, map)).append("\n");
 
             Renderer.increaseTab();
         }
@@ -1365,13 +1370,13 @@ public class Translator
         public void checkType(String value, EluneType actualType, List<EluneType> allowedTypes)
         {
             if (actualType == null)
-                actualType = getType(value);
+                actualType = getType(value, true);
 
             try
             {
                 for (EluneType allowedType : allowedTypes)
                 {
-                    if (checkType(value, actualType, allowedType, true, false))
+                    if (checkType(value, actualType, allowedType, true, true))
                         return;
                 }
 

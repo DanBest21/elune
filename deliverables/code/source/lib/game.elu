@@ -22,7 +22,8 @@ game.methodType =
 	QUERY = 4,
 	UI = 5,
 	MESSAGE = 6,
-	LOOKUP = 7
+	LOOKUP = 7,
+	RETRIEVE = 8
 }
 
 global def game:getCategories()
@@ -84,17 +85,17 @@ global def game:get(attribute)
 	}
 }
 
-global def game:set(attribute, value)
+global def game:set(attribute, ...)
 {
 	methods = game:getRecordsOnType(game.methodType.SET)
 	
 	foreach _, methodContents in methods
 	{
-		foreach valueName, _ in methodContents.returnValues
+		foreach valueName, _ in methodContents.parameters
 		{
 			if valueName == attribute
 			{
-				return methodContents.method(value)
+				return methodContents.method(...)
 			}
 		}
 	}
@@ -149,11 +150,27 @@ global def game:lookup(tableName, attribute)
 	
 	foreach _, contents in tables
 	{
-		foreach valueName, _ in methodContents.returnValues
+		foreach valueName, _ in contents.returnValues
 		{	
 			if (valueName == tableName)
 			{
 				return contents.method[attribute]
+			}
+		}
+	}
+}
+
+global def game:retrieve(attribute)
+{
+	tables = game:getRecordsOnType(game.methodType.RETRIEVE)
+	
+	foreach _, contents in tables
+	{		
+		foreach valueName, _ in contents.returnValues
+		{			
+			if valueName == attribute
+			{	
+				return contents.method
 			}
 		}
 	}

@@ -63,7 +63,7 @@ stat
     | 'do' '{' block '}' 'while' exp                                                    #doWhile
     | ifStmt elseIfStmt* elseStmt?                                                      #ifElse
     | 'for' NAME '=' exp ',' exp (',' exp)? '{' block '}'                               #for
-    | 'foreach' (NAME ',')? NAME 'in' explist '{' block '}'                             #foreach
+    | 'foreach' (NAME ',')? (('|' NAME '|') | NAME) 'in' explist '{' block '}'          #foreach
     | 'global' 'def' funcname funcbody                                                  #globalFunc
     | 'def' NAME funcbody                                                               #func
     | 'def' funcname funcbody                                                           #objFunc
@@ -196,9 +196,9 @@ nameAndArgs
     ;
 
 args
-    : '(' explist? ')'                                                              #exprArgs
-//  | tableconstructor                                                              #tableconstructorArgs
-    | string                                                                        #stringArgs
+    : '(' explist? ')'                                                                  #exprArgs
+//  | tableconstructor                                                                  #tableconstructorArgs
+    | string                                                                            #stringArgs
     ;
 
 anondef
@@ -210,8 +210,8 @@ anonlist
     ;
 
 anonOrName
-    : NAME                                                                          #name
-    | anondef                                                                       #anondef__
+    : NAME                                                                              #name
+    | anondef                                                                           #anondef__
     ;
 
 funcbody
@@ -223,8 +223,8 @@ parlist
     ;
 
 tableconstructor
-    : '[' explist? ']'                                                              #array
-    | '{' fieldlist? '}'                                                            #dictionary
+    : '[' explist? ']'                                                                  #array
+    | '{' fieldlist? '}'                                                                #dictionary
     ;
 
 fieldlist
@@ -232,9 +232,9 @@ fieldlist
     ;
 
 field
-    : '(' exp ')' '=' exp                                                           #exprField
-    | NAME '=' exp                                                                  #varField
-    | exp                                                                           #indexedField
+    : '(' exp ')' '=' exp                                                               #exprField
+    | NAME '=' exp                                                                      #varField
+    | exp                                                                               #indexedField
     ;
 
 fieldsep

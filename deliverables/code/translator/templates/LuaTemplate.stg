@@ -40,6 +40,7 @@ forEnd(inc, num) ::= <<
     <if(num)>::continue_<num>::<endif>
 end >>
 forEach(index, element, list) ::= << for <if(index)><index><else>_<endif>, <element> in <if(index)>pairs<else>ipairs<endif>(<list>) do >>
+forEachIterator(element, list) ::= << for <element> in <list> do >>
 
 if(cond) ::= << if <cond> then >>
 elseIf(cond) ::= << elseif <cond> then >>

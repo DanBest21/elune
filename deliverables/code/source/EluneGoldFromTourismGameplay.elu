@@ -4,6 +4,7 @@ if not ExposedMembers.DB_YT
 }
 
 DB_YT = ExposedMembers.DB_YT
+civ = DB_YT.game
 
 // This function triggers immediately after the player received their normal science/culture yields for the turn
 def YT_GoldFromTourism(ActivePlayerID, blsFirstTime)
@@ -13,20 +14,17 @@ def YT_GoldFromTourism(ActivePlayerID, blsFirstTime)
 		return null
 	}
 
-	GoldFromForeignTourists = 0
-	ForeignTourists = DB_YT.YT_GetGoldFromForeignTourists(ActivePlayerID)
+	GoldFromForeignTourists = DB_YT.YT_GetGoldFromForeignTourists(ActivePlayerID)
 
 	if GoldFromForeignTourists > 0
 	{
-		// Players[ActivePlayerID]:GetTreasury():ChangeGoldBalance(GoldFromForeignTourists)
-		civ:set("goldBalance", civ:lookup("player", ActivePlayerID), goldBalance)
+		civ:set("goldBalance", civ:lookup("player", ActivePlayerID), GoldFromForeignTourists)
 	}
 }
 
 def YT_GoldFromTourism_Init()
 {
-	// Events.PlayerTurnActivated.Add(YT_GoldFromTourism)
-	civ:set("callbackMethod", civ:get("playerTurnActivated"), YT_GoldFromTourism)
+	civ:set("callbackMethod", civ:retrieve("playerTurnActivated"), YT_GoldFromTourism)
 }
 
 YT_GoldFromTourism_Init()
