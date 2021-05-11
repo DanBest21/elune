@@ -1,0 +1,38 @@
+def split_at(xs, n)
+{
+	a = []
+	b = []
+	
+	for i = 0, i < length xs, i += 1
+	{
+		if i >= n
+		{
+			break
+		}
+		
+		a[i] = xs[i]
+	}
+	
+	for i = 0, i < length xs, i += 1
+	{
+		b[i] = xs[i + n]
+	}
+	
+	return a, b
+}
+
+a, b = split_at([10, 20, 30, 40, 50, 60, 70, 80, 90, 100], 5)
+
+print "First half:"
+
+foreach ai in a
+{
+	print ai
+}
+
+print "Second half:"
+
+foreach bi in b
+{
+	print bi
+}

@@ -1,0 +1,9 @@
+xs = [1, 2, 3, 4, 5]
+ys = [6, 7, 8, 9, 10]
+
+ms = merge(xs, ys)
+
+foreach x in filter(lambda x { return x % 30 == 0 }, map(lambda x { return x * 10 }, slice(2, 6, ms)))
+{
+	print x
+}

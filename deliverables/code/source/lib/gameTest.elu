@@ -1,0 +1,229 @@
+global game = {}
+
+game.map = {}
+
+game.dataType = 
+{
+	NULL = 1,
+	INT = 2,
+	FLOAT = 3,
+	STRING = 4,
+	BOOLEAN = 5,
+	FUNCTION = 6,
+	VAR = 7,
+	EVENT = 8
+}
+
+game.methodType =
+{
+	GET = 1,
+	SET = 2,
+	CHECK = 3,
+	QUERY = 4,
+	UI = 5,
+	MESSAGE = 6,
+	LOOKUP = 7,
+	RETRIEVE = 8
+}
+
+global def game:getCategories()
+{
+	categories = []
+	i = 0
+
+	foreach name, contents in game.map
+	{
+		categories[i] = name
+		i += 1
+	}
+
+	return categories
+}
+
+global def game:getRecordsOnType(methodType)
+{
+	records = {}
+	
+	foreach _, category in game.map
+	{			
+		foreach name, record in category
+		{
+			if record.methodType is methodType
+			{
+				records[name] = record
+			}
+		}
+	}
+	
+	return records
+}
+
+global def game:get(attribute)
+{
+	methods = game:getRecordsOnType(game.methodType.GET)
+	
+	foreach _, methodContents in methods
+	{
+		i = 0
+		
+		foreach valueName, _ in methodContents.returnValues
+		{
+			if valueName == attribute
+			{
+				if size(methodContents.returnValues) > 1
+				{
+					return methodContents.method()[i]
+				}
+				else
+				{
+					return methodContents.method()
+				}
+			}
+			
+			i += 1
+		}
+	}
+}
+
+global def game:set(attribute, ...)
+{
+	methods = game:getRecordsOnType(game.methodType.SET)
+	
+	foreach _, methodContents in methods
+	{
+		foreach valueName, _ in methodContents.parameters
+		{
+			if valueName == attribute
+			{
+				return methodContents.method(...)
+			}
+		}
+	}
+}
+
+global def game:check(attribute, ...)
+{
+	methods = game:getRecordsOnType(game.methodType.CHECK)
+	
+	foreach _, methodContents in methods
+	{
+		foreach valueName, _ in methodContents.returnValues
+		{
+			if valueName == attribute
+			{
+				return methodContents.method(...)
+			}
+		}
+	}
+}
+
+global def game:query(attribute, ...)
+{
+	methods = game:getRecordsOnType(game.methodType.QUERY)
+	
+	foreach _, methodContents in methods
+	{
+		i = 0
+		
+		foreach valueName, _ in methodContents.returnValues
+		{			
+			if valueName == attribute
+			{
+				if size(methodContents.returnValues) > 1
+				{
+					return methodContents.method(...)[i]
+				}
+				else
+				{
+					return methodContents.method(...)
+				}
+			}
+			
+			i += 1
+		}
+	}
+}
+
+global def game:lookup(tableName, attribute)
+{
+	tables = game:getRecordsOnType(game.methodType.LOOKUP)
+	
+	foreach _, contents in tables
+	{
+		foreach valueName, _ in contents.returnValues
+		{	
+			if (valueName == tableName)
+			{
+				return contents.method[attribute]
+			}
+		}
+	}
+}
+
+global def game:retrieve(attribute)
+{
+	tables = game:getRecordsOnType(game.methodType.RETRIEVE)
+	
+	foreach _, contents in tables
+	{		
+		foreach valueName, _ in contents.returnValues
+		{			
+			if valueName == attribute
+			{	
+				return contents.method
+			}
+		}
+	}
+}
+
+global def game:addCategory(name, contents)
+{
+	game.map[name] = contents
+}
+
+global def game:getCategory(name)
+{
+	return game.map[name]
+}
+
+global def game:call(category, name, ...)
+{
+	// expectedReturnValues = size(game.map[category][name].returnValues)
+	return game.map[category][name].method(...)
+
+	/*
+	try
+	{
+		if (length values != expectedReturnValues)
+		{
+			throw DispatcherException
+		}
+	}
+	catch DispatcherException
+	{
+		print "DispatcherException: Function '" ++ name ++ "' returned " ++ length values ++ " values, but expected " ++ expectedReturnValues ++ "."
+	}
+	*/
+}
+
+global def game:getDescription(category, name)
+{
+	return game.map[category][name].description
+} 
+
+global def game.new(f, t, params, ret, desc, add)
+{
+	record = 
+	{
+		method = f,
+		methodType = t,
+		parameters = params,
+		returnValues = ret,
+		description = desc,
+		additionalInformation = add
+	}
+
+	return record
+}
+
+return game

@@ -1,0 +1,7 @@
+i = 0
+
+do
+{
+	i += 1
+	print "This will be true twice."
+} while i < 2

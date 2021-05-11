@@ -1,0 +1,16 @@
+str = "refer"
+output = ""
+
+global getmetatable('').__index = lambda str i { return string.sub(str, i, i) }
+
+i = 0
+j = length str - 1
+
+while str[i] == str[j] && i <= j
+{
+	output = output ++ str[i]
+	i += 1
+	j -= 1
+}
+
+print output

@@ -1,0 +1,8 @@
+f = lambda x { return x * 10 }
+
+xs = map(f, [1, 2, 3, 4, 5])
+
+foreach x in xs
+{
+	print(x)
+}

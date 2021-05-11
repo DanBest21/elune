@@ -1346,7 +1346,7 @@ public class Translator
             {
                 if (actualType != expectedType && !multipleChoice)
                 {
-                    throw new EluneTypeException("Value '" +
+                    throw new EluneTypeException("The value of the variable '" +
                             value +
                             "' is type of '" +
                             actualType.name().toLowerCase(Locale.ROOT) +
@@ -1380,10 +1380,10 @@ public class Translator
                         return;
                 }
 
-                StringJoiner allowedTypeString = new StringJoiner(", ");
+                StringJoiner allowedTypeString = new StringJoiner("', '");
                 allowedTypes.forEach(x -> allowedTypeString.add(x.name().toLowerCase(Locale.ROOT)));
 
-                throw new EluneTypeException("Value '" +
+                throw new EluneTypeException("The value of the variable '" +
                         value +
                         "' is type of '" +
                         actualType.name().toLowerCase(Locale.ROOT) +
@@ -1901,7 +1901,9 @@ public class Translator
 
             List<EluneType> acceptedTypes;
 
-            if (map.get("symbol").toString().equals("-"))
+            if (map.get("symbol").toString().equals("~"))
+                acceptedTypes = Arrays.asList(EluneType.INT, EluneType.FLOAT, EluneType.BOOLEAN, EluneType.NULL);
+            else if (map.get("symbol").toString().equals("-"))
                 acceptedTypes = Arrays.asList(EluneType.INT, EluneType.FLOAT);
             else
                 acceptedTypes = Arrays.asList(EluneType.BOOLEAN, EluneType.NULL);
@@ -2105,10 +2107,16 @@ public class Translator
     {
         targetLanguage = args[1];
 
-        boolean disableContinue = args[2] != null && args[2].equals("off");
-        boolean disableImports = args[3] != null && args[3].equals("off");
+        boolean disableContinue = args.length > 2 && args[2].equals("off");
+        boolean disableImports = args.length > 3 && args[3].equals("off");
 
         generateFile(args[0], disableContinue, disableImports);
+    }
+
+    public static EluneTranslator generateFile(String pathname, String translationLanguage)
+    {
+        targetLanguage = translationLanguage;
+        return generateFile(pathname, false, false, false);
     }
 
     public static EluneTranslator generateFile(String pathname, boolean disableContinue, boolean disableImports) { return generateFile(pathname, true, disableContinue, disableImports); }

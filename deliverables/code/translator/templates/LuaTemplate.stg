@@ -36,8 +36,8 @@ for(var, start, end) ::= <<
 local <var> = <start>
 while <end> do >>
 forEnd(inc, num) ::= <<
-    <inc>
     <if(num)>::continue_<num>::<endif>
+    <inc>
 end >>
 forEach(index, element, list) ::= << for <if(index)><index><else>_<endif>, <element> in <if(index)>pairs<else>ipairs<endif>(<list>) do >>
 forEachIterator(element, list) ::= << for <element> in <list> do >>
