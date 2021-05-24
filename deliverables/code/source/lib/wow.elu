@@ -5,6 +5,20 @@ wow.dataType["TEXTURE"] = size(wow.dataType)
 wow.dataType["FRAME"] = size(wow.dataType)
 wow.dataType["UNIT_ID"] = size(wow.dataType)
 
+// Enums
+wow.inviteStatus = 
+{
+	INVITED = 1,
+	ACCEPTED = 2,
+	DECLINED = 3,
+	CONFIRMED = 4,
+	OUT = 5,
+	STANDBY = 6,
+	SIGNEDUP = 7,
+	NOT_SIGNEDUP = 8,
+	TENTATIVE = 9,
+}
+
 achievements = 
 {
 	GetRewardItemID = wow.new(C_AchievementInfo.GetRewardItemID, wow.methodType.GET, { achievementID = wow.dataType.INT }, { rewardItemID = wow.dataType.INT }, "Returns any reward item for an achievement.", null),
@@ -22,6 +36,10 @@ calendar =
 {
 	CanAddEvent = wow.new(C_Calendar.CanAddEvent, wow.methodType.CHECK, {}, { canAddEvent = wow.dataType.BOOLEAN }, "Returns whether the player can add an event.", null),
 	EventDecline = wow.new(C_Calendar.EventDecline, wow.methodType.UI, {}, {}, "Declines the invitation to the currently open event.", null),
+	GetEventIndex = wow.new(C_Calendar.GetEventIndex, wow.methodType.GET, {}, { eventIndex = wow.dataType.VAR }, "Returns the event index info for the currently selected event.", null),
+	GetInvite = wow.new(C_Calendar.EventGetInvite, wow.methodType.QUERY, { inviteeIndex = wow.dataType.INT }, { invite = wow.dataType.VAR }, "Returns status information for an invitee for the currently opened event.", null),
+	GetNumInvites = wow.new(C_Calendar.GetNumInvites, wow.methodType.GET, {}, { numInvites = wow.dataType.INT }, "Returns the number of invitees for the currently opened event.", null),
+	IsEventOpen = wow.new(C_Calendar.IsEventOpen, wow.methodType.CHECK, {}, { eventOpen = wow.dataType.BOOLEAN }, "Returns whether or not a calendar event is currently open.", null),
 	OpenCalendar = wow.new(C_Calendar.OpenCalendar, wow.methodType.UI, {}, {}, "Requests calendar information from the server. Does not open the calendar frame.", "Fires CALENDAR_UPDATE_EVENT_LIST, when your query has finished processing on the server and new calendar information is available. If called during the loading process, (even at PLAYER_ENTERING_WORLD) the query will not return."),
 	OpenEvent = wow.new(C_Calendar.OpenEvent, wow.methodType.UI, { offsetMonths = wow.dataType.INT, monthDay = wow.dataType.INT, index = wow.dataType.INT }, { success = wow.dataType.BOOLEAN }, "Establishes an event for future calendar API calls", null)
 }

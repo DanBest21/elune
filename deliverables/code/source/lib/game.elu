@@ -11,7 +11,8 @@ game.dataType =
 	BOOLEAN = 5,
 	FUNCTION = 6,
 	VAR = 7,
-	EVENT = 8
+	EVENT = 8,
+	ENUM = 9,
 }
 
 game.methodType =

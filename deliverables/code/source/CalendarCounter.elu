@@ -1,0 +1,34 @@
+eluCounter = wow:call("ui", "CreateFrame", "Frame", "CalendarCounterFrame", UIParent)
+eluCounter:RegisterEvent("CALENDAR_OPEN_EVENT")
+eluCounter:SetScript("OnEvent", lambda self event ...
+{
+	if (wow:check("eventOpen"))
+	{
+		accepted = 0
+		tentative = 0
+		declined = 0
+		
+		for i = 1, i <= wow:get("numInvites"), i += 1
+		{	
+			inviteStatus = wow:query("invite", i).inviteStatus
+			
+			if inviteStatus is wow.inviteStatus.ACCEPTED or inviteStatus is wow.inviteStatus.CONFIRMED 
+			{ 
+				accepted += 1 
+			}
+			elseif inviteStatus is wow.inviteStatus.TENTATIVE or inviteStatus is wow.inviteStatus.STANDBY
+			{
+				tentative += 1
+			}
+			elseif inviteStatus is wow.inviteStatus.DECLINED or inviteStatus is wow.inviteStatus.OUT
+			{
+				declined += 1
+			}
+		}
+		
+		print("Event respondant info:")
+		print("\124cff00ff00Accepted: " ++ accepted ++ "\124r")
+		print("\124cffFFC125Tentative: " ++ tentative ++ "\124r")
+		print("\124cffff0000Declined: " ++ declined ++ "\124r")
+	}
+})
