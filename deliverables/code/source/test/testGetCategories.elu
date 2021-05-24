@@ -1,0 +1,4 @@
+foreach category in wow:getCategories()
+{
+	print category
+}

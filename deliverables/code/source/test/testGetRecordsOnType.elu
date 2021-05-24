@@ -1,0 +1,4 @@
+foreach name, _ in wow:getRecordsOnType(wow.methodType.GET)
+{
+	print name
+}

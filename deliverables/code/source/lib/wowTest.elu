@@ -1,0 +1,83 @@
+global wow = game
+
+// Custom types
+wow.dataType["TEXTURE"] = size(wow.dataType)
+wow.dataType["FRAME"] = size(wow.dataType)
+wow.dataType["UNIT_ID"] = size(wow.dataType)
+
+achievements = 
+{
+	GetRewardItemID = wow.new(/*C_AchievementInfo.GetRewardItemID*/ null, wow.methodType.GET, { achievementID = wow.dataType.INT }, { rewardItemID = wow.dataType.INT }, "Returns any reward item for an achievement.", null),
+	GetSupercedingAchievements = wow.new(/*C_AchievementInfo.GetSupercedingAchievements*/ lambda { return "Supercede this." } , wow.methodType.GET, { achievementID = wow.dataType.INT }, { supercedingAchievements = wow.dataType.VAR }, "Returns the next achievement in a series.", null),
+	IsValidAchievement = wow.new(/*C_AchievementInfo.IsValidAchievement*/ lambda { return "Yes. Yes it is." }, wow.methodType.CHECK, { achievementID = wow.dataType.INT }, { isValidAchievement = wow.dataType.BOOLEAN }, "Needs summary.", null),
+	GetNextAchievement = wow.new(GetNextAchievement, wow.methodType.GET, { achievementID = wow.dataType.INT }, { nextAchievementID = wow.dataType.INT }, "Return the next achievement in a chain.", null),
+	IsTrackedAchievement = wow.new(IsTrackedAchievement, wow.methodType.CHECK, { achievementID = wow.dataType.INT }, { eligible = wow.dataType.BOOLEAN }, "Returns if an achievement is currently being tracked.", null),
+	IsAchievementEligible = wow.new(IsAchievementEligible, wow.methodType.CHECK, { achievementID = wow.dataType.INT }, { eligible = wow.dataType.BOOLEAN }, "Indicates whether the specified achievement is eligible to be completed.", null),
+	SetAchievementSearchString = wow.new(SetAchievementSearchString, wow.methodType.SET, { searchText = wow.dataType.STRING }, { searchFinished = wow.dataType.BOOLEAN }, "Starts a search for achievements containing the specified text.", null)
+}
+
+wow:addCategory("achievements", achievements)
+
+calendar = 
+{
+	CanAddEvent = wow.new(/*C_Calendar.CanAddEvent*/ null, wow.methodType.CHECK, {}, { canAddEvent = wow.dataType.BOOLEAN }, "Returns whether the player can add an event.", null),
+	EventDecline = wow.new(/*C_Calendar.EventDecline*/ null, wow.methodType.UI, {}, {}, "Declines the invitation to the currently open event.", null),
+	OpenCalendar = wow.new(/*C_Calendar.OpenCalendar*/ null, wow.methodType.UI, {}, {}, "Requests calendar information from the server. Does not open the calendar frame.", "Fires CALENDAR_UPDATE_EVENT_LIST, when your query has finished processing on the server and new calendar information is available. If called during the loading process, (even at PLAYER_ENTERING_WORLD) the query will not return."),
+	OpenEvent = wow.new(/*C_Calendar.OpenEvent*/ null, wow.methodType.UI, { offsetMonths = wow.dataType.INT, monthDay = wow.dataType.INT, index = wow.dataType.INT }, { success = wow.dataType.BOOLEAN }, "Establishes an event for future calendar API calls", null)
+}
+
+wow:addCategory("calendar", calendar)
+
+chat =
+{
+	SendChatMessage = wow.new(SendChatMessage, wow.methodType.MESSAGE, { msg = wow.dataType.STRING, chatType = wow.dataType.STRING, languageID = wow.dataType.INT, target = wow.dataType.STRING }, {}, "Sends a chat message.", "Fires CHAT_MSG_* events, e.g. CHAT_MSG_SAY and CHAT_MSG_CHANNEL. RAID_WARNING is accessible to raid leaders, or to all members of a party (when not in a raid). WHISPER works across all realms in a region, it's not restricted to connected realms and you don't need to have interacted with the recipient before.")
+}
+
+wow:addCategory("chat", chat)
+
+combat = 
+{
+	GetCurrentEventInfo = wow.new(CombatLogGetCurrentEventInfo, wow.methodType.GET, {}, { timestamp = wow.dataType.FLOAT, subevent = wow.dataType.STRING, hideCaster = wow.dataType.BOOLEAN, sourceGUID = wow.dataType.STRING, sourceName = wow.dataType.STRING, sourceFlags = wow.dataType.INT, sourceRaidFlags = wow.dataType.INT, destGUID = wow.dataType.STRING, destName = wow.dataType.STRING, destFlags = wow.dataType.INT, destRaidFlags = wow.dataType.INT }, "Returns the current COMBAT_LOG_EVENT payload.", "In the new event system for 8.0, supporting the original functionality of the CLEU event was problematic due to the context arguments, i.e. each argument can be interpreted differently depending on the previous arguments. The payload was subsequently moved to this function.")
+}
+
+wow:addCategory("combat", combat)
+
+groups = 
+{
+	GetNumGroupMembers = wow.new(GetNumGroupMembers, wow.methodType.QUERY, { groupType = wow.dataType.INT }, { numGroupMembers = wow.dataType.INT }, "Returns the total number of players in a group.", ""),
+	IsInGroup = wow.new(IsInGroup, wow.methodType.CHECK, { groupType = wow.dataType.INT }, { inGroup = wow.dataType.BOOLEAN }, "Returns whether the player is in a [specific type of] group.", "The HOME category includes Parties and Raids. It is possible for a character to belong to a party or a raid at the same time they are in an instance group (LFR or Flex). To distinguish between a party and a raid, use the IsInRaid() function."),
+	IsInRaid = wow.new(IsInRaid, wow.methodType.CHECK, { groupType = wow.dataType.INT }, { inRaid = wow.dataType.BOOLEAN }, "Indicates whether the player is in a [specific type of] raid group.", "This returns true in arenas if groupType is LE_PARTY_CATEGORY_INSTANCE or is unspecified.")
+}
+
+wow:addCategory("groups", groups)
+
+instances =
+{
+	IsInInstance = wow.new(IsInInstance, wow.methodType.CHECK, {}, { inInstance = wow.dataType.BOOLEAN, instanceType = wow.dataType.STRING }, "Checks whether the player is in an instance and the type of instance.", "This functon returns correct results immediately upon PLAYER_ENTERING_WORLD.")
+}
+
+wow:addCategory("instances", instances)
+
+spells = 
+{
+	GetSpellLink = wow.new(GetSpellLink, wow.methodType.QUERY, { spellID = wow.dataType.INT, spellName = wow.dataType.STRING, slot = wow.dataType.INT, bookType = wow.dataType.STRING }, { spellLink = wow.dataType.STRING /*, spellID = wow.dataType.INT */ }, "Returns a hyperlink for a spell.", "")
+}
+
+wow:addCategory("spells", spells)
+
+ui =
+{
+	CreateFrame = wow.new(CreateFrame, wow.methodType.UI, { frameType = wow.dataType.STRING, name = wow.dataType.STRING, parent = wow.dataType.FRAME, template = wow.dataType.STRING, id = wow.dataType.INT }, { frame = wow.dataType.FRAME }, "Creates a new Frame object.", "Frames cannot be deleted or garbage collected, but they can be reused/recycled (There technically is a way to destroy frames by parenting them to a user waypoint frame). Fires the frame's OnLoad script, if it has one from an inherited template."),
+	EasyMenu = wow.new(EasyMenu, wow.methodType.UI, { menuList = wow.dataType.VAR, menuFrame = wow.dataType.FRAME, anchor = wow.dataType.STRING, x = wow.dataType.FLOAT, y = wow.dataType.FLOAT, displayMode = wow.dataType.STRING, autoHideDisplay = wow.dataType.FLOAT }, {}, "Populate a context menu with options described in a provided table.", "The menu becomes visible as soon as you call the function and goes away after you click a menu item unless keepShownOnClick in menuList was set to 1. UIDropDownMenu_Initialize will be called on the menuFrame argument, which will modify its layout. For this reason, avoid using your own widgets that do not inherit from UIDropDownMenuTemplate as the menuFrame argument. Fine-grained control over the positioning of the menu is possible by setting the menuFrame.point and menuFrame.relativePoint values to specific anchor points to use when anchoring the frame to a non-cursor region." )
+}
+
+wow:addCategory("ui", ui)
+
+unit = 
+{
+	UnitGUID = wow.new(UnitGUID, wow.methodType.QUERY, { unit = wow.dataType.UNIT_ID }, { unitGUID = wow.dataType.STRING }, "Returns the GUID of the specified unit.", "")
+}
+
+wow:addCategory("unit", unit)
+
+return wow

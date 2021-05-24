@@ -1,0 +1,32 @@
+var = true
+var2 = 2
+
+switch var
+{
+	case true
+	{
+		switch var2
+		{
+			case 1
+			{
+				print "???"
+			}
+			case 2
+			{
+				print "It works!"
+			}
+			default
+			{
+				print "Nope!"
+			}
+		}
+	}
+	case false
+	{
+		print "False"
+	}
+	default
+	{
+		print "Invalid"
+	}
+}

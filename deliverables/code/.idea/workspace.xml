@@ -4,10 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2dc25c1f-797e-4fa3-8481-4fa2eca8a16a" name="Default Changelist" comment="Cleaned up the project.">
+    <list default="true" id="2dc25c1f-797e-4fa3-8481-4fa2eca8a16a" name="Default Changelist" comment="Added the initial attempt at a mod for Civilization 6.">
+      <change afterPath="$PROJECT_DIR$/test/EluneTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/lib/game.elu" beforeDir="false" afterPath="$PROJECT_DIR$/source/lib/game.elu" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser/Elune.g4" beforeDir="false" afterPath="$PROJECT_DIR$/parser/Elune.g4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/test.elu" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/test.lua" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/test_temp.elu" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/translator/Translator.java" beforeDir="false" afterPath="$PROJECT_DIR$/translator/Translator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translator/templates/LuaTemplate.stg" beforeDir="false" afterPath="$PROJECT_DIR$/translator/templates/LuaTemplate.stg" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,17 +70,7 @@
       <recent name="C:\Users\Dan\university-git\Year 3\COMP3200 - Individual Research Project\research-project\deliverables\code" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration name="Translator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="ALTERNATIVE_JRE_PATH" value="11" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="Translator" />
-      <module name="translator" />
-      <option name="PROGRAM_PARAMETERS" value="./source/EluneInterruptAnnouncer.elu lua off off" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.EluneTest">
     <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -86,9 +82,69 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="EluneTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="translator" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="EluneTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EluneTest.testGenericGet" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="translator" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="EluneTest" />
+      <option name="METHOD_NAME" value="testGenericGet" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EluneTest.testPrintIntervalRange" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="translator" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="EluneTest" />
+      <option name="METHOD_NAME" value="testPrintIntervalRange" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EluneTest.testPrintMultipleStepRange" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="translator" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="EluneTest" />
+      <option name="METHOD_NAME" value="testPrintMultipleStepRange" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EluneTest.testPrintNegativeStepRange" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="translator" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="EluneTest" />
+      <option name="METHOD_NAME" value="testPrintNegativeStepRange" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="JUnit.EluneTest.testPrintIntervalRange" />
+      <item itemvalue="JUnit.EluneTest.testPrintMultipleStepRange" />
+      <item itemvalue="JUnit.EluneTest.testPrintNegativeStepRange" />
+      <item itemvalue="JUnit.EluneTest" />
+      <item itemvalue="JUnit.EluneTest.testGenericGet" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Translator" />
+        <item itemvalue="JUnit.EluneTest" />
+        <item itemvalue="JUnit.EluneTest.testGenericGet" />
+        <item itemvalue="JUnit.EluneTest.testPrintNegativeStepRange" />
+        <item itemvalue="JUnit.EluneTest.testPrintMultipleStepRange" />
+        <item itemvalue="JUnit.EluneTest.testPrintIntervalRange" />
       </list>
     </recent_temporary>
   </component>
@@ -118,7 +174,10 @@
       <workItem from="1619072372222" duration="644000" />
       <workItem from="1619117483204" duration="1541000" />
       <workItem from="1619145983561" duration="38000" />
-      <workItem from="1619146075439" duration="304000" />
+      <workItem from="1619146075439" duration="20305000" />
+      <workItem from="1620685008963" duration="109000" />
+      <workItem from="1620685145090" duration="82000" />
+      <workItem from="1620685352798" duration="18346000" />
     </task>
     <task id="LOCAL-00001" summary="Began work on the translator.">
       <created>1617255252555</created>
@@ -183,7 +242,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619060577998</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Added the initial attempt at a mod for Civilization 6.">
+      <created>1619146454677</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1619146454677</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -211,24 +277,20 @@
     <MESSAGE value="Fixed some issues to get the language to work for WoW." />
     <MESSAGE value="Added gitignore file." />
     <MESSAGE value="Cleaned up the project." />
-    <option name="LAST_COMMIT_MESSAGE" value="Cleaned up the project." />
+    <MESSAGE value="Added the initial attempt at a mod for Civilization 6." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added the initial attempt at a mod for Civilization 6." />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/translator/Translator.java</url>
-          <line>385</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="org.stringtemplate.v4.STGroupFile" memberName="templates" />
       </pinned-members>
     </pin-to-top-manager>
     <watches-manager>
+      <configuration name="JUnit">
+        <watch expression="console.readLine()" language="JAVA" />
+        <watch expression="new BufferedReader(new InputStreamReader(process.getErrorStream())).readLine()" language="JAVA" />
+      </configuration>
       <configuration name="Application">
         <watch expression="translatedCode.toString().endsWith(&quot;;&quot;)" language="JAVA" />
       </configuration>

@@ -1,0 +1,38 @@
+def exists(var)
+{
+	if var is null
+	{
+		throw NullPointerException
+	}
+	else
+	{
+		print "It does exist!"
+	}
+}
+
+def isCheese(string)
+{
+	if string is "cheese"
+	{
+		throw CheeseException
+	}
+}
+
+try
+{
+	var = "cheese"
+	exists(var)
+	isCheese(var)
+}
+catch NullPointerException
+{
+	print "NullPointerException: var does not exist!"
+}
+catch CheeseException
+{
+	print "Cheese Gromit! Cheese!"
+}
+finally
+{
+	print "Not even Wensleydale?"
+}

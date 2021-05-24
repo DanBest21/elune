@@ -1,4 +1,0 @@
-import wow
-
-xs = wow:call("achievements", "GetRewardItemID", 6, [1, 2, 3, 4, 5])[0]
-printList(xs)

@@ -1,0 +1,24 @@
+f = lambda x { if x % 3 == 0 { return true } else { return false } }
+
+def filter_skip(b, xs)
+{
+	ys = []
+	i = 0
+	
+	foreach x in xs
+	{
+		if b(x) { continue }
+		
+		ys[i] = x
+		i += 1
+	}
+	
+	return ys
+}
+
+ys_skip = filter_skip(f, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+foreach y in ys_skip
+{
+	print y
+} 

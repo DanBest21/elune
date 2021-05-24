@@ -1,0 +1,16 @@
+i = 0
+loops = 0
+
+while i < 10
+{
+	for j = 0, j < 5, j += 1
+	{
+		loops += 1
+		
+		if j % 2 == 0 { continue }
+		
+		i += 1
+	}
+}
+
+print loops

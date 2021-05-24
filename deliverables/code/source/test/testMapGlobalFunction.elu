@@ -1,0 +1,13 @@
+global g = 7
+
+global def multiply_g(x)
+{
+	return x * g
+}
+
+xs = map(multiply_g, [1, 2, 3, 4, 5])
+
+foreach x in xs
+{
+	print(x)
+}
