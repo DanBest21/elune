@@ -12,6 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 public class Translator
 {
     private static String targetLanguage;
+    private static String outputPath;
 
     public EluneTranslator translate(Path path, boolean importStdLibrary, boolean disableContinue, boolean disableImports)
     {
@@ -2105,10 +2106,11 @@ public class Translator
 
     public static void main(String[] args)
     {
-        targetLanguage = args[1];
+        targetLanguage = args[2];
+        outputPath = args[1];
 
-        boolean disableContinue = args.length > 2 && args[2].equals("off");
-        boolean disableImports = args.length > 3 && args[3].equals("off");
+        boolean disableContinue = args.length > 2 && args[3].equals("off");
+        boolean disableImports = args.length > 3 && args[4].equals("off");
 
         generateFile(args[0], disableContinue, disableImports);
     }
@@ -2130,7 +2132,7 @@ public class Translator
 
         try
         {
-            File outputFile = new File("./source/gen/" + FilenameUtils.removeExtension(path.getFileName().toString()) + "." + targetLanguage.toLowerCase(Locale.ROOT));
+            File outputFile = new File(outputPath + "/" + FilenameUtils.removeExtension(path.getFileName().toString()) + "." + targetLanguage.toLowerCase(Locale.ROOT));
 
             if (outputFile.exists())
                 outputFile.delete();

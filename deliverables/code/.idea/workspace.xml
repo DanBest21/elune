@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Elune:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2dc25c1f-797e-4fa3-8481-4fa2eca8a16a" name="Default Changelist" comment="Added the initial attempt at a mod for Civilization 6.">
-      <change afterPath="$PROJECT_DIR$/test/EluneTest.java" afterDir="false" />
+    <list default="true" id="2dc25c1f-797e-4fa3-8481-4fa2eca8a16a" name="Default Changelist" comment="Changed pom to create">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser/Elune.g4" beforeDir="false" afterPath="$PROJECT_DIR$/parser/Elune.g4" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/test.elu" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/test.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/test_temp.elu" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/translator/Translator.java" beforeDir="false" afterPath="$PROJECT_DIR$/translator/Translator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/translator/templates/LuaTemplate.stg" beforeDir="false" afterPath="$PROJECT_DIR$/translator/templates/LuaTemplate.stg" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +37,13 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/translator/Translator.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/parser/Lua.g4" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/parser/Elune.g4" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/pom.xml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/translator/templates/LuaTemplate.stg" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProjectId" id="1qU3P6EkvPzeCBFGejRRaLIuDPV" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -53,16 +59,16 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/source/EluneInterruptAnnouncer.elu" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/target" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="project.structure.last.edited" value="Libraries" />
-    <property name="project.structure.proportion" value="0.3254717" />
-    <property name="project.structure.side.proportion" value="0.3854489" />
+    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.proportion" value="0.102923974" />
+    <property name="project.structure.side.proportion" value="0.13298272" />
     <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.repository.indices" />
   </component>
   <component name="RecentsManager">
@@ -70,7 +76,47 @@
       <recent name="C:\Users\Dan\university-git\Year 3\COMP3200 - Individual Research Project\research-project\deliverables\code" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.EluneTest">
+  <component name="RunManager" selected="Application.Interrupt Announcer">
+    <configuration name="API Dispatcher" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Translator" />
+      <module name="translator" />
+      <option name="PROGRAM_PARAMETERS" value=".\source\lib\game.elu .\source\gen lua off off" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Calendar Counter" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Translator" />
+      <module name="translator" />
+      <option name="PROGRAM_PARAMETERS" value=".\source\demo\CalendarCounter.elu .\source\gen lua off off" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Interrupt Announcer" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Translator" />
+      <module name="translator" />
+      <option name="PROGRAM_PARAMETERS" value=".\source\EluneInterruptAnnouncer.elu .\source\gen lua off off" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Standard Library" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Translator" />
+      <module name="translator" />
+      <option name="PROGRAM_PARAMETERS" value=".\source\lib\std.elu .\source\gen lua off off" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WoW Adaptor" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Translator" />
+      <module name="translator" />
+      <option name="PROGRAM_PARAMETERS" value=".\source\lib\wow.elu .\source\gen lua off off" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -81,6 +127,27 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
+    </configuration>
+    <configuration name="Demo Mod" type="CompoundRunConfigurationType">
+      <toRun name="API Dispatcher" type="Application" />
+      <toRun name="Standard Library" type="Application" />
+      <toRun name="WoW Adaptor" type="Application" />
+      <toRun name="Calendar Counter" type="Application" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Interrupt Announcer" type="CompoundRunConfigurationType">
+      <toRun name="WoW Adaptor" type="Application" />
+      <toRun name="Standard Library" type="Application" />
+      <toRun name="API Dispatcher" type="Application" />
+      <toRun name="Interrupt Announcer" type="Application" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="CompoundRunConfigurationType">
+      <toRun name="WoW Adaptor" type="Application" />
+      <toRun name="Standard Library" type="Application" />
+      <toRun name="API Dispatcher" type="Application" />
+      <toRun name="Interrupt Announcer" type="Application" />
+      <method v="2" />
     </configuration>
     <configuration name="EluneTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="translator" />
@@ -96,16 +163,6 @@
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="EluneTest" />
       <option name="METHOD_NAME" value="testGenericGet" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="EluneTest.testPrintIntervalRange" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="translator" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="EluneTest" />
-      <option name="METHOD_NAME" value="testPrintIntervalRange" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -132,7 +189,13 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="JUnit.EluneTest.testPrintIntervalRange" />
+      <item itemvalue="Application.Interrupt Announcer" />
+      <item itemvalue="Application.API Dispatcher" />
+      <item itemvalue="Application.WoW Adaptor" />
+      <item itemvalue="Application.Calendar Counter" />
+      <item itemvalue="Application.Standard Library" />
+      <item itemvalue="Compound.Interrupt Announcer" />
+      <item itemvalue="Compound.Demo Mod" />
       <item itemvalue="JUnit.EluneTest.testPrintMultipleStepRange" />
       <item itemvalue="JUnit.EluneTest.testPrintNegativeStepRange" />
       <item itemvalue="JUnit.EluneTest" />
@@ -144,7 +207,6 @@
         <item itemvalue="JUnit.EluneTest.testGenericGet" />
         <item itemvalue="JUnit.EluneTest.testPrintNegativeStepRange" />
         <item itemvalue="JUnit.EluneTest.testPrintMultipleStepRange" />
-        <item itemvalue="JUnit.EluneTest.testPrintIntervalRange" />
       </list>
     </recent_temporary>
   </component>
@@ -178,6 +240,10 @@
       <workItem from="1620685008963" duration="109000" />
       <workItem from="1620685145090" duration="82000" />
       <workItem from="1620685352798" duration="18346000" />
+      <workItem from="1621936291800" duration="799000" />
+      <workItem from="1622009486128" duration="814000" />
+      <workItem from="1622033867679" duration="1981000" />
+      <workItem from="1627924550834" duration="9712000" />
     </task>
     <task id="LOCAL-00001" summary="Began work on the translator.">
       <created>1617255252555</created>
@@ -297,6 +363,7 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/translator$Gold_From_Tourism_UI.ic" NAME="Gold From Tourism UI Coverage Results" MODIFIED="1619319614665" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
     <SUITE FILE_PATH="coverage/code$Translator.ic" NAME="Translator Coverage Results" MODIFIED="1617157097608" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>
