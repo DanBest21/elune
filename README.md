@@ -1,8 +1,8 @@
 # Elune
 
-Elune is a domain-specific language (DSL) created for the purpose of creating game modifications that was developed as the subject of my degree's dissertation.
+Elune is a domain-specific language (DSL) created for the purpose of developing game modifications; it was produced as the subject of my degree's dissertation/final year research project.
 
-Elune is a dynamically typed which primarily aims to address the shortcomings of the most dominant programming language currently used for this purpose — **Lua**. The syntax takes inspiration from Python and C-based languages, and thus aims to follow more standard programming language conventions (e.g. C-style for loops and zero indexing).
+Elune is a dynamically typed language, which primarily aims to address the shortcomings of the most dominant programming language currently used for this purpose — **Lua**. The syntax takes inspiration from Python and C-based languages, and thus aims to follow more standard programming language conventions (e.g. C-style for loops and zero indexing).
 
 The language is made up of several components:
 
@@ -11,7 +11,7 @@ The language is made up of several components:
 - A **template** that defines the output of the translation, which makes use of the StringTemplate template engine. Currently, the only existing working template is for Lua, as there are some aspects of the translator that are currently hard-coded which would first need to be abstracted in order to make the idea of retargeting the language feasible.
 - **Libraries** which provide additional functionality.
 
-In particular, a **Generic API** library was created in order to try and generalise APIs across games. The idea is that a single **API Dispatcher** exists to handle any interaction with the game's API, which connects to an **API Adaptor** that is hand-coded to needs of each game.
+A noteworthy library is the **Generic API** library that was created in order to try and generalise APIs across games. The idea is that a single **API Dispatcher** exists to handle interaction with the game's API, which _connects_ to an **API Adaptor** that is handwritten to needs of each game.
 
 For instance, the call:
 
