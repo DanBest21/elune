@@ -39,6 +39,6 @@ where:
 - `<continue_keyword_toggle>` can be toggled `off`, which will disable the continue keyword from working in the language, since Lua in some games does not allow for the use of labels.
 - `<imports_toggle>` can be toggled `off`, which will disable the ability to import libraries, since Lua in some game does not allow for the use of the `require` keyword.
 
-## Credits
+## Acknowledgements
 
 I would like to thank my supervisor Dr Julian Rathke for all his help and support on this project. I would also like to thank Terence Parr for the **ANTLR** (https://www.antlr.org/) and **StringTemplate** (https://www.stringtemplate.org/) tools, which were instrumental to this project's success. Finally, I would like to credit Leafo's **MoonScript** (https://moonscript.org/), which I took inspiration from when designing the grammar.
